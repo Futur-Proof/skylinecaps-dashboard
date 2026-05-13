@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyline Capital — Platform Architecture & Strategy</title>
+<style>
+  :root {
+    --black: #0a0a0a;
+    --dark: #111111;
+    --card: #161616;
+    --border: #222222;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --silver: #9CA3AF;
+    --bronze: #CD7F32;
+    --text: #E5E5E5;
+    --muted: #888888;
+    --green: #22C55E;
+    --blue: #3B82F6;
+    --purple: #A855F7;
+    --red: #EF4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(10,10,10,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    padding: 0 2rem;
+  }
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 0;
+    overflow-x: auto;
+  }
+  nav ul li a {
+    display: block;
+    padding: 1rem 1.1rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  nav ul li a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    padding: 7rem 2rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 2rem;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .stat { border-left: 2px solid var(--gold); padding-left: 1rem; }
+  .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--gold-light); }
+  .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* SECTIONS */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .card-gold { border-left: 3px solid var(--gold); }
+  .card-silver { border-left: 3px solid var(--silver); }
+  .card-bronze { border-left: 3px solid var(--bronze); }
+  .card-blue { border-left: 3px solid var(--blue); }
+  .card-purple { border-left: 3px solid var(--purple); }
+  .card-green { border-left: 3px solid var(--green); }
+
+  /* GRIDS */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+  /* REVENUE STREAMS */
+  .stream {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stream::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -10px; right: 10px;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--gold);
+    opacity: 0.05;
+    line-height: 1;
+  }
+  .stream-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .stream h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .stream p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+  .stream-revenue {
+    font-size: 0.8rem;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold-light);
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* WATERFALL */
+  .waterfall {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .wf-step {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0;
+  }
+  .wf-label {
+    padding: 1.2rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    border-right: 2px solid var(--border);
+  }
+  .wf-content {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .wf-content:last-child { border-bottom: none; }
+  .wf-gold { background: rgba(201,168,76,0.06); }
+  .wf-gold .wf-label { color: var(--gold); border-right-color: var(--gold); }
+  .wf-silver { background: rgba(156,163,175,0.04); }
+  .wf-silver .wf-label { color: var(--silver); border-right-color: var(--silver); }
+  .wf-bronze { background: rgba(205,127,50,0.04); }
+  .wf-bronze .wf-label { color: var(--bronze); border-right-color: var(--bronze); }
+  .wf-content h4 { font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .wf-content p { font-size: 0.82rem; color: var(--muted); }
+  .wf-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+  .tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .tag-gold { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+  .tag-blue { background: rgba(59,130,246,0.15); color: #93C5FD; }
+  .tag-green { background: rgba(34,197,94,0.15); color: #86EFAC; }
+  .tag-red { background: rgba(239,68,68,0.15); color: #FCA5A5; }
+  .tag-purple { background: rgba(168,85,247,0.15); color: #D8B4FE; }
+  .tag-silver { background: rgba(156,163,175,0.15); color: #D1D5DB; }
+
+  /* PIPELINE */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .pipeline-stage {
+    flex: 1;
+    min-width: 120px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 1rem 0.8rem;
+    position: relative;
+  }
+  .pipeline-stage:last-child { border-right: 1px solid var(--border); }
+  .pipeline-stage::after {
+    content: '›';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--gold);
+    z-index: 2;
+    background: var(--card);
+  }
+  .pipeline-stage:last-child::after { display: none; }
+  .stage-name { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .stage-action { font-size: 0.82rem; font-weight: 500; }
+
+  /* DB TABLE */
+  .db-group { margin-bottom: 2rem; }
+  .db-group-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .db-tables { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .db-table {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--silver);
+  }
+  .db-table span { color: var(--muted); font-size: 0.7rem; }
+
+  /* ROUTES */
+  .route-group { margin-bottom: 1.5rem; }
+  .route-group-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .routes { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .route {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.74rem;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    color: var(--text);
+  }
+  .route .method {
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-right: 0.4rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+  }
+  .get { background: rgba(34,197,94,0.2); color: #86EFAC; }
+  .post { background: rgba(59,130,246,0.2); color: #93C5FD; }
+  .put { background: rgba(234,179,8,0.2); color: #FDE047; }
+
+  /* INTEGRATION CARDS */
+  .integration {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .integration h4 { font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .integration ul { list-style: none; padding: 0; }
+  .integration ul li {
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.2rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .integration ul li:last-child { border-bottom: none; }
+  .integration ul li::before { content: '→'; color: var(--gold); flex-shrink: 0; }
+
+  /* LEAD PRICING */
+  .pricing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .pricing-row:first-child {
+    background: var(--dark);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pricing-row div { padding: 0.75rem 1rem; font-size: 0.83rem; }
+  .pricing-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+  /* COMPLIANCE */
+  .compliance-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .compliance-item:last-child { border-bottom: none; }
+  .compliance-icon { color: var(--gold); font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .compliance-item h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .compliance-item p { font-size: 0.8rem; color: var(--muted); }
+
+  /* TECH STACK */
+  .tech-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .tech-item .tech-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .tech-item .tech-role { font-size: 0.75rem; color: var(--muted); }
+
+  /* INVESTOR FLOW */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .flow-step h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .flow-step p { font-size: 0.8rem; color: var(--muted); }
+
+  /* MATH BOX */
+  .math-box {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 2;
+  }
+  .math-line { display: flex; justify-content: space-between; align-items: center; }
+  .math-line.total {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-weight: 700;
+  }
+  .math-label { color: var(--muted); }
+  .math-value { color: var(--text); }
+  .math-value.positive { color: var(--green); }
+
+  /* PHASE TIMELINE */
+  .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+  }
+  .phase-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .phase h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .phase ul { list-style: none; padding: 0; }
+  .phase ul li {
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.25rem 0;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .phase ul li::before { content: '✓'; color: var(--green); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82em;
+    background: var(--dark);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    color: var(--gold-light);
+  }
+
+  @media (max-width: 600px) {
+    .pricing-row { grid-template-columns: 1fr 1fr; }
+    .wf-step { grid-template-columns: 80px 1fr; }
+    .hero-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#streams">Revenue Streams</a></li>
+    <li><a href="#leads">Lead Tiers</a></li>
+    <li><a href="#waterfall">Waterfall</a></li>
+    <li><a href="#pipeline">CRM Pipeline</a></li>
+    <li><a href="#database">Database</a></li>
+    <li><a href="#routes">Routes</a></li>
+    <li><a href="#integrations">Integrations</a></li>
+    <li><a href="#investor">Investor Portal</a></li>
+    <li><a href="#marketplace">Data Marketplace</a></li>
+    <li><a href="#compliance">Compliance</a></li>
+    <li><a href="#phases">Build Phases</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="overview">
+  <div class="hero-label">Skyline Capital Group — Internal Architecture Document</div>
+  <h1>The <span>Full Stack</span> SMB<br>Lending Platform</h1>
+  <p>Five revenue streams. One lead. A modern alternative to LendingTree built for the $50B+ SMB alternative lending market.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Revenue Streams</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">$50K–$1M</div>
+      <div class="stat-label">Target Loan Range</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">7.3M</div>
+      <div class="stat-label">LendingTree Visits/Mo</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">8–12%</div>
+      <div class="stat-label">Broker Commission</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">20–25%</div>
+      <div class="stat-label">Investor Target Return</div>
+    </div>
+  </div>
+</div>
+
+<!-- REVENUE STREAMS -->
+<section id="streams">
+  <div class="section-label">Business Model</div>
+  <h2>Five Revenue Streams</h2>
+  <p class="section-sub">Every lead that enters the platform monetizes across multiple paths. Nothing is wasted.</p>
+
+  <div class="grid-3" style="margin-bottom:2rem;">
+    <div class="stream" data-num="1">
+      <div class="stream-num">Stream 01</div>
+      <h3>Lead Origination & Resale</h3>
+      <p>Inbound platform captures SMB applicants via SEO and YouTube. Unworked leads are packaged and sold to brokers and lenders.</p>
+      <div class="stream-revenue">$0.50–$200 per lead</div>
+    </div>
+    <div class="stream" data-num="2">
+      <div class="stream-num">Stream 02</div>
+      <h3>Brokerage (Commission)</h3>
+      <p>Qualified leads are placed with lender partners. No capital required. Pure commission on every funded deal.</p>
+      <div class="stream-revenue">8–12% of funded amount</div>
+    </div>
+    <div class="stream" data-num="3">
+      <div class="stream-num">Stream 03</div>
+      <h3>Direct Lending</h3>
+      <p>Best deals are funded directly using investor capital. Higher margin than brokering. Daily/weekly ACH repayments.</p>
+      <div class="stream-revenue">30–50% return / 6–8 mo</div>
+    </div>
+    <div class="stream" data-num="4">
+      <div class="stream-num">Stream 04</div>
+      <h3>Investor Capital Returns</h3>
+      <p>Accredited investors deploy $50K–$500K+. Platform allocates to funded loans, credits returns as repayments come in.</p>
+      <div class="stream-revenue">20–25% target investor return</div>
+    </div>
+    <div class="stream" data-num="5">
+      <div class="stream-num">Stream 05</div>
+      <h3>Data Marketplace</h3>
+      <p>Structured marketplace for tiered lead sales. Aged, fresh, and real-time exclusive listings sold to verified buyers.</p>
+      <div class="stream-revenue">Resell same data 3–5x</div>
+    </div>
+  </div>
+
+  <div class="card" style="background: var(--dark);">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">The Flywheel</div>
+    <div style="font-size:0.9rem;color:var(--muted);line-height:2;">
+      Lead comes in →
+      <span style="color:var(--gold)">Qualify & Tier</span> →
+      Gold gets funded directly →
+      <span style="color:var(--gold)">Investors earn 20–25%</span> →
+      Silver gets brokered →
+      <span style="color:var(--gold)">$8K–$25K commission</span> →
+      Bronze gets listed on marketplace →
+      <span style="color:var(--gold)">$0.50–$45/lead sold 3–5x</span> →
+      Revenue from every tier covers cost of lead acquisition → Net lead cost approaches $0
+    </div>
+  </div>
+</section>
+
+<!-- LEAD TIERS -->
+<section id="leads">
+  <div class="section-label">Lead Qualification</div>
+  <h2>Lead Tier System</h2>
+  <p class="section-sub">Hard gate: 12+ months in business, $50K+/month gross deposits. Everything is tiered from there.</p>
+
+  <div class="grid-3" style="margin-bottom:2rem;">
+    <div class="card card-gold">
+      <div style="color:var(--gold);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;">Gold — Cream</div>
+      <div style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">$250K – $1M</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">$500K–$5M+ annual revenue</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">2+ years in business</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">Could qualify for bank — needs speed</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">No tax return required — bank statements only</li>
+        <li style="padding:0.3rem 0;font-size:0.82rem;color:var(--muted);">Plaid login or 3–6 months statements</li>
+      </ul>
+      <div style="margin-top:1rem;">
+        <div class="tag tag-gold" style="margin-bottom:0.3rem;display:block;text-align:center;">Fund Directly → $75K–$100K return</div>
+        <div class="tag tag-blue" style="display:block;text-align:center;">Broker → $20K–$100K commission</div>
+      </div>
+    </div>
+    <div class="card card-silver">
+      <div style="color:var(--silver);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;">Silver — Core</div>
+      <div style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">$50K – $250K</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">$150K–$500K annual revenue</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">1–3 years in business</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">Bank said no or slow</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">Real cash flow, messy books</li>
+        <li style="padding:0.3rem 0;font-size:0.82rem;color:var(--muted);">600–680 credit, some blemishes</li>
+      </ul>
+      <div style="margin-top:1rem;">
+        <div class="tag tag-silver" style="display:block;text-align:center;">Broker Placement → $5K–$20K commission</div>
+      </div>
+    </div>
+    <div class="card card-bronze">
+      <div style="color:var(--bronze);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;">Bronze — Volume</div>
+      <div style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">Under $50K</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">Under $150K annual revenue</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">Sub-600 credit</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">MCA only option</li>
+        <li style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--muted);">High default risk</li>
+        <li style="padding:0.3rem 0;font-size:0.82rem;color:var(--muted);">High volume, low margin</li>
+      </ul>
+      <div style="margin-top:1rem;">
+        <div class="tag tag-purple" style="display:block;text-align:center;">Marketplace → $3–$15/lead resale</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--dark);">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">Hard Qualification Gate (runs on every submission)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+      <div style="font-size:0.83rem;"><span style="color:var(--green);">✓</span>&nbsp; 12+ months in business</div>
+      <div style="font-size:0.83rem;"><span style="color:var(--green);">✓</span>&nbsp; $50K+/month gross deposits</div>
+      <div style="font-size:0.83rem;"><span style="color:var(--green);">✓</span>&nbsp; Existing business (no startups)</div>
+      <div style="font-size:0.83rem;"><span style="color:var(--red);">✗</span>&nbsp; No personal loans</div>
+      <div style="font-size:0.83rem;"><span style="color:var(--red);">✗</span>&nbsp; No collateral / real estate</div>
+      <div style="font-size:0.83rem;"><span style="color:var(--red);">✗</span>&nbsp; No startups under 12 months</div>
+    </div>
+  </div>
+</section>
+
+<!-- WATERFALL -->
+<section id="waterfall">
+  <div class="section-label">Routing Engine</div>
+  <h2>Lead Routing Waterfall</h2>
+  <p class="section-sub">Every lead is evaluated and routed automatically. Rules are configurable from the admin panel — no code deploy needed.</p>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:2rem;">
+    <div class="waterfall">
+      <div class="wf-step wf-gold">
+        <div class="wf-label">Gold</div>
+        <div class="wf-content">
+          <h4>Direct Lending Desk → Premium Broker Partners</h4>
+          <p>Check direct lending capacity (admin-configurable weekly cap). If capacity available → assign to senior rep (round-robin). If at cap → route to premium broker partner with gold tier access, sorted by conversion rate.</p>
+          <div class="wf-actions">
+            <span class="tag tag-gold">Fund directly</span>
+            <span class="tag tag-blue">Senior rep assigned</span>
+            <span class="tag tag-green">Premium partner fallback</span>
+          </div>
+        </div>
+      </div>
+      <div class="wf-step wf-silver">
+        <div class="wf-label">Silver</div>
+        <div class="wf-content">
+          <h4>Broker Placement Queue</h4>
+          <p>Find active broker partners where silver is in their tier access. Apply partner filters (state, industry, amount range). Score and assign to best-matching partner. Notify via webhook. Rep follow-up set to 4 hours.</p>
+          <div class="wf-actions">
+            <span class="tag tag-silver">Partner webhook push</span>
+            <span class="tag tag-blue">Filter match scoring</span>
+            <span class="tag tag-gold">4hr rep follow-up</span>
+          </div>
+        </div>
+      </div>
+      <div class="wf-step wf-bronze">
+        <div class="wf-label">Bronze</div>
+        <div class="wf-content">
+          <h4>Data Marketplace Auto-List</h4>
+          <p>Check data quality (Plaid connected OR bank statements uploaded). If sufficient → create marketplace listing, price computed by data richness formula. If insufficient → email borrower to add statements; mark stale after 72h.</p>
+          <div class="wf-actions">
+            <span class="tag tag-purple">Auto-listed on marketplace</span>
+            <span class="tag tag-silver">Priced by data richness</span>
+            <span class="tag tag-red">Stale at 72h if no docs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.75rem;letter-spacing:0.1em;text-transform:uppercase;">Re-Evaluation Triggers</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;font-size:0.82rem;">
+      <div style="color:var(--muted);">→ Borrower adds more info after stale</div>
+      <div style="color:var(--muted);">→ Broker partner returns lead as unworkable</div>
+      <div style="color:var(--muted);">→ Admin manually triggers re-route</div>
+      <div style="color:var(--muted);">→ Fresh lead ages 7 days without contact → auto-listed</div>
+    </div>
+  </div>
+</section>
+
+<!-- CRM PIPELINE -->
+<section id="pipeline">
+  <div class="section-label">CRM</div>
+  <h2>Deal Pipeline</h2>
+  <p class="section-sub">9-stage pipeline with automated stage transitions, rep notifications, and borrower emails.</p>
+
+  <div class="pipeline" style="margin-bottom:2rem;">
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 1</div>
+      <div class="stage-action">New Lead</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 2</div>
+      <div class="stage-action">Initial Contact</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 3</div>
+      <div class="stage-action">Docs Requested</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 4</div>
+      <div class="stage-action">Docs Received</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 5</div>
+      <div class="stage-action">Submitted to Lender</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 6</div>
+      <div class="stage-action">Approved</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="stage-name">Stage 7</div>
+      <div class="stage-action">Funded</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-gold">
+      <h4 style="margin-bottom:0.75rem;">Commission Calculation</h4>
+      <div class="math-box">
+        <div class="math-line"><span class="math-label">Funded Amount</span><span class="math-value">$250,000</span></div>
+        <div class="math-line"><span class="math-label">Commission Rate</span><span class="math-value">10%</span></div>
+        <div class="math-line total"><span>Gross Commission</span><span class="math-value positive">$25,000</span></div>
+      </div>
+    </div>
+    <div class="card card-blue">
+      <h4 style="margin-bottom:0.75rem;">Rep Capacity Rules</h4>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:2;">
+        <div>Gold leads → Senior reps only</div>
+        <div>Silver leads → Any rep with &lt;50 open deals</div>
+        <div>Bronze → Auto to marketplace, no rep assigned</div>
+        <div>Capacity = open deals not in funded/dead/declined</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAD PRICING -->
+<section>
+  <div class="section-label">Data Marketplace</div>
+  <h2>Lead Pricing Matrix</h2>
+  <p class="section-sub">Tiered pricing based on recency, data richness, and exclusivity. Same lead can be sold multiple times.</p>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:2rem;">
+    <div class="pricing-row">
+      <div>Lead Type</div>
+      <div>Age</div>
+      <div>Price Range</div>
+      <div>Max Sales</div>
+    </div>
+    <div class="pricing-row">
+      <div><span class="tag tag-gold">Real-Time Exclusive</span></div>
+      <div style="color:var(--muted);">Under 24h, Plaid verified</div>
+      <div style="color:var(--gold);">$50–$200+</div>
+      <div style="color:var(--muted);">1x only</div>
+    </div>
+    <div class="pricing-row">
+      <div><span class="tag tag-blue">Fresh</span></div>
+      <div style="color:var(--muted);">1–7 days</div>
+      <div style="color:var(--blue);">$15–$45</div>
+      <div style="color:var(--muted);">3x</div>
+    </div>
+    <div class="pricing-row">
+      <div><span class="tag tag-silver">Aged</span></div>
+      <div style="color:var(--muted);">30–180+ days</div>
+      <div style="color:var(--silver);">$0.50–$3</div>
+      <div style="color:var(--muted);">5x</div>
+    </div>
+    <div class="pricing-row">
+      <div><span class="tag tag-purple">Bulk Batch</span></div>
+      <div style="color:var(--muted);">Mixed, high volume</div>
+      <div style="color:var(--purple);">$0.05–$0.20/record</div>
+      <div style="color:var(--muted);">Unlimited</div>
+    </div>
+  </div>
+
+  <div class="card card-gold">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.75rem;letter-spacing:0.1em;text-transform:uppercase;">Pricing Formula</div>
+    <div class="math-box" style="font-size:0.78rem;">
+      <div style="color:var(--muted);margin-bottom:0.5rem;">base_price [by tier + listing type]</div>
+      <div class="math-line"><span class="math-label">+ Plaid connected</span><span class="math-value">+15%</span></div>
+      <div class="math-line"><span class="math-label">+ Bank statements uploaded</span><span class="math-value">+10%</span></div>
+      <div class="math-line"><span class="math-label">+ 24+ months in business</span><span class="math-value">+10%</span></div>
+      <div class="math-line"><span class="math-label">+ Deposits &gt; $100K/mo</span><span class="math-value">+20%</span></div>
+      <div class="math-line"><span class="math-label">+ High-demand state (CA/TX/FL/NY)</span><span class="math-value">+10%</span></div>
+      <div class="math-line total"><span>Final Price</span><span class="math-value positive">= min(base × multiplier, tier_max)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DATABASE -->
+<section id="database">
+  <div class="section-label">Data Architecture</div>
+  <h2>Database Schema</h2>
+  <p class="section-sub">Supabase Postgres. RLS enabled on all tables. Plaid tokens encrypted via Supabase Vault.</p>
+
+  <div class="db-group">
+    <div class="db-group-title">Identity & Access</div>
+    <div class="db-tables">
+      <div class="db-table">users <span>role, mfa_enabled</span></div>
+      <div class="db-table">user_sessions <span>ip, user_agent</span></div>
+      <div class="db-table">roles_permissions <span>role → permission</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Borrower & Business</div>
+    <div class="db-tables">
+      <div class="db-table">borrowers <span>ssn_last4, dob, plaid_verified</span></div>
+      <div class="db-table">businesses <span>ein, naics, avg_monthly_deposits</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Leads & Applications</div>
+    <div class="db-tables">
+      <div class="db-table">leads <span>tier, status, routing_decision</span></div>
+      <div class="db-table">lead_events <span>audit trail</span></div>
+      <div class="db-table">applications <span>status, doc flags</span></div>
+      <div class="db-table">application_documents <span>type, verified</span></div>
+      <div class="db-table">plaid_connections <span>access_token_enc</span></div>
+      <div class="db-table">plaid_accounts <span>balances</span></div>
+      <div class="db-table">plaid_transactions <span>deposits, categories</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Loans & Repayments</div>
+    <div class="db-tables">
+      <div class="db-table">loan_offers <span>factor_rate, total_payback</span></div>
+      <div class="db-table">funded_loans <span>status, ach_mandate</span></div>
+      <div class="db-table">repayments <span>scheduled, collected, failed</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Brokerage</div>
+    <div class="db-tables">
+      <div class="db-table">broker_partners <span>tier_access, webhook_url</span></div>
+      <div class="db-table">broker_submissions <span>lender, status, funded_at</span></div>
+      <div class="db-table">commissions <span>amount, status, paid_at</span></div>
+      <div class="db-table">lender_submissions <span>multi-lender per deal</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Data Marketplace</div>
+    <div class="db-tables">
+      <div class="db-table">marketplace_listings <span>type, price, times_sold</span></div>
+      <div class="db-table">data_buyers <span>api_key_hash, webhook_url</span></div>
+      <div class="db-table">marketplace_purchases <span>lead_data_snapshot</span></div>
+      <div class="db-table">marketplace_filters <span>buyer preferences</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Investor Portal</div>
+    <div class="db-tables">
+      <div class="db-table">investors <span>accreditation, kyc_status</span></div>
+      <div class="db-table">investor_accounts <span>available, deployed balance</span></div>
+      <div class="db-table">investor_deposits <span>stripe_payment_intent_id</span></div>
+      <div class="db-table">investor_withdrawals <span>status, processed_at</span></div>
+      <div class="db-table">capital_deployments <span>ownership_pct, expected_return</span></div>
+      <div class="db-table">investor_returns <span>gross, net, platform_fee</span></div>
+      <div class="db-table">investor_statements <span>monthly PDF</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">CRM</div>
+    <div class="db-tables">
+      <div class="db-table">crm_deals <span>stage, priority, days_in_stage</span></div>
+      <div class="db-table">crm_activities <span>call, email, sms, note</span></div>
+      <div class="db-table">crm_tasks <span>due_at, assigned_to</span></div>
+    </div>
+  </div>
+
+  <div class="db-group">
+    <div class="db-group-title">Infrastructure</div>
+    <div class="db-tables">
+      <div class="db-table">notifications <span>in-app, realtime</span></div>
+      <div class="db-table">email_logs <span>resend message_id</span></div>
+      <div class="db-table">webhook_events <span>stripe, plaid raw payloads</span></div>
+      <div class="db-table">audit_logs <span>before/after state on admin writes</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROUTES -->
+<section id="routes">
+  <div class="section-label">Application Routes</div>
+  <h2>Next.js 15 Route Map</h2>
+  <p class="section-sub">App Router structure. Each role group is isolated behind middleware + RLS.</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="route-group">
+        <div class="route-group-title">Public / Borrower</div>
+        <div class="routes">
+          <div class="route">/</div>
+          <div class="route">/apply</div>
+          <div class="route">/apply/connect-bank</div>
+          <div class="route">/apply/documents</div>
+          <div class="route">/apply/confirmation</div>
+          <div class="route">/apply/status</div>
+        </div>
+      </div>
+      <div class="route-group">
+        <div class="route-group-title">CRM (Sales Reps)</div>
+        <div class="routes">
+          <div class="route">/crm</div>
+          <div class="route">/crm/leads</div>
+          <div class="route">/crm/deals</div>
+          <div class="route">/crm/deals/[id]/submit</div>
+          <div class="route">/crm/commissions</div>
+          <div class="route">/crm/tasks</div>
+        </div>
+      </div>
+      <div class="route-group">
+        <div class="route-group-title">Data Marketplace (Buyers)</div>
+        <div class="routes">
+          <div class="route">/marketplace</div>
+          <div class="route">/marketplace/[id]</div>
+          <div class="route">/marketplace/purchases</div>
+          <div class="route">/marketplace/account</div>
+          <div class="route">/marketplace/api-docs</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="route-group">
+        <div class="route-group-title">Investor Portal</div>
+        <div class="routes">
+          <div class="route">/investor</div>
+          <div class="route">/investor/deposit</div>
+          <div class="route">/investor/withdraw</div>
+          <div class="route">/investor/portfolio</div>
+          <div class="route">/investor/returns</div>
+          <div class="route">/investor/statements</div>
+          <div class="route">/investor/accreditation</div>
+        </div>
+      </div>
+      <div class="route-group">
+        <div class="route-group-title">Admin</div>
+        <div class="routes">
+          <div class="route">/admin</div>
+          <div class="route">/admin/leads</div>
+          <div class="route">/admin/funded-loans</div>
+          <div class="route">/admin/repayments</div>
+          <div class="route">/admin/investors</div>
+          <div class="route">/admin/capital</div>
+          <div class="route">/admin/marketplace</div>
+          <div class="route">/admin/commissions</div>
+          <div class="route">/admin/reports/[stream]</div>
+          <div class="route">/admin/settings/routing</div>
+        </div>
+      </div>
+      <div class="route-group">
+        <div class="route-group-title">API Webhooks</div>
+        <div class="routes">
+          <div class="route"><span class="method post">POST</span>/api/webhooks/stripe</div>
+          <div class="route"><span class="method post">POST</span>/api/webhooks/plaid</div>
+          <div class="route"><span class="method post">POST</span>/api/webhooks/resend</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section id="integrations">
+  <div class="section-label">Third-Party Stack</div>
+  <h2>Integrations</h2>
+  <p class="section-sub">Every integration has a specific role. No overlap, no redundancy.</p>
+
+  <div class="grid-3">
+    <div class="integration">
+      <h4 style="color:var(--gold);margin-bottom:0.75rem;">Plaid</h4>
+      <ul>
+        <li>Borrower bank connection during application (Link Token → Public Token exchange)</li>
+        <li>Transaction sync — identify deposits, compute avg monthly deposits</li>
+        <li>Identity verification — legal name match</li>
+        <li>Investor ACH setup via processor token → Stripe bank account</li>
+        <li>Access tokens encrypted via Supabase Vault</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--blue);margin-bottom:0.75rem;">Stripe</h4>
+      <ul>
+        <li>Investor deposits — PaymentElement, ACH debit for large amounts</li>
+        <li>Marketplace purchases — charge buyer card on file</li>
+        <li>Loan repayments — scheduled ACH debits, daily queue</li>
+        <li>Commission payouts — Stripe Connect or manual ACH</li>
+        <li>Stripe Customer objects for investors and data buyers</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--green);margin-bottom:0.75rem;">Resend</h4>
+      <ul>
+        <li>Lead confirmation to borrower</li>
+        <li>Application status updates</li>
+        <li>Document request emails</li>
+        <li>Loan offer and funded confirmations</li>
+        <li>Daily repayment confirmations</li>
+        <li>Monthly investor statements (PDF attached)</li>
+        <li>Marketplace purchase receipts</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--purple);margin-bottom:0.75rem;">Supabase</h4>
+      <ul>
+        <li>Postgres — primary data store, all tables</li>
+        <li>Auth — email/password + magic link + MFA (TOTP)</li>
+        <li>RLS — row-level security on every table</li>
+        <li>Vault — Plaid token encryption (pgsodium)</li>
+        <li>Storage — documents, statements, accreditation docs</li>
+        <li>Realtime — leads, repayments, investor returns, notifications</li>
+        <li>Edge Functions — async work (Plaid sync, PDF gen, webhooks)</li>
+        <li>pg_cron — lead aging, statements, repayment queue</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--silver);margin-bottom:0.75rem;">Middesk / Persona</h4>
+      <ul>
+        <li>KYB (Know Your Business) — EIN verification</li>
+        <li>OFAC sanctions screening</li>
+        <li>Beneficial ownership verification</li>
+        <li>Required for direct lending arm compliance</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--gold-light);margin-bottom:0.75rem;">Parallel Markets (Phase 2)</h4>
+      <ul>
+        <li>Investor accreditation verification service</li>
+        <li>Third-party verification letter from CPA/attorney</li>
+        <li>Required for Reg D 506(c) compliance</li>
+        <li>Replaces manual document review</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- INVESTOR PORTAL -->
+<section id="investor">
+  <div class="section-label">Investor Portal</div>
+  <h2>Capital & Returns Architecture</h2>
+  <p class="section-sub">Accredited investors deploy capital into direct loans. Returns flow back as borrowers repay. Supabase Realtime keeps dashboards live.</p>
+
+  <div class="grid-2">
+    <div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">Investor Onboarding Flow</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div>
+            <h4>Register & Profile</h4>
+            <p>Creates investor record with status = pending_accreditation</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div>
+            <h4>Accreditation</h4>
+            <p>Select basis (income / net worth / licensed professional). Upload supporting doc. Admin reviews and approves.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div>
+            <h4>Sign Subscription Agreement</h4>
+            <p>Electronic signature required before any capital is accepted. Required by Reg D.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div>
+            <h4>Deposit Capital</h4>
+            <p>Stripe PaymentElement, ACH bank debit for amounts over $10K. $50K minimum. Credited to available_balance.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div>
+            <h4>Capital Deployed</h4>
+            <p>Admin allocates capital to funded loans. Investor gets notified. deployed_balance increases.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div>
+            <h4>Returns Credited Live</h4>
+            <p>Every repayment collected → investor's pro-rata share calculated → platform fee deducted → net credited in realtime.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">Return Calculation Per Repayment</div>
+      <div class="math-box" style="margin-bottom:1rem;">
+        <div class="math-line"><span class="math-label">Repayment collected</span><span class="math-value">$5,000</span></div>
+        <div class="math-line"><span class="math-label">Investor ownership %</span><span class="math-value">40%</span></div>
+        <div class="math-line"><span class="math-label">Gross investor share</span><span class="math-value">$2,000</span></div>
+        <div class="math-line"><span class="math-label">Platform fee (2%)</span><span class="math-value">−$40</span></div>
+        <div class="math-line total"><span>Net to investor</span><span class="math-value positive">$1,960</span></div>
+      </div>
+
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">Monthly Statement (auto-generated)</div>
+      <div class="card" style="font-size:0.82rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;color:var(--muted);">
+          <div>Opening Balance</div><div style="text-align:right;color:var(--text);">$500,000</div>
+          <div>Deposits</div><div style="text-align:right;color:var(--text);">$0</div>
+          <div>Returns Earned</div><div style="text-align:right;color:var(--green);">+$10,416</div>
+          <div>Fees Charged</div><div style="text-align:right;color:var(--red);">−$208</div>
+          <div>Withdrawals</div><div style="text-align:right;color:var(--text);">$0</div>
+          <div style="border-top:1px solid var(--border);padding-top:0.5rem;color:var(--text);">Closing Balance</div>
+          <div style="border-top:1px solid var(--border);padding-top:0.5rem;text-align:right;color:var(--gold-light);font-weight:700;">$510,208</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETPLACE -->
+<section id="marketplace">
+  <div class="section-label">Data Marketplace</div>
+  <h2>B2B Lead Marketplace</h2>
+  <p class="section-sub">External brokers and lenders buy leads directly via API or dashboard. The same lead that didn't convert internally generates revenue as data.</p>
+
+  <div class="grid-2">
+    <div class="card card-purple">
+      <h4 style="margin-bottom:0.75rem;">Buyer API Flow</h4>
+      <div class="flow-steps">
+        <div class="flow-step" style="padding:0.6rem 0;">
+          <div class="flow-num" style="width:22px;height:22px;font-size:0.65rem;">1</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Buyer registers, gets API key, sets marketplace_filters (states, industries, amounts, lead types)</div>
+        </div>
+        <div class="flow-step" style="padding:0.6rem 0;">
+          <div class="flow-num" style="width:22px;height:22px;font-size:0.65rem;">2</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Webhook fires when new listing matches their filters</div>
+        </div>
+        <div class="flow-step" style="padding:0.6rem 0;">
+          <div class="flow-num" style="width:22px;height:22px;font-size:0.65rem;">3</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Buyer purchases via API → Stripe charge → lead_data_snapshot created</div>
+        </div>
+        <div class="flow-step" style="padding:0.6rem 0;">
+          <div class="flow-num" style="width:22px;height:22px;font-size:0.65rem;">4</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Delivery: webhook POST + email CSV + dashboard download</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-green">
+      <h4 style="margin-bottom:0.75rem;">100K Declined Leads Math</h4>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">If a large funder (PayPal, OnDeck) sells their declined pipeline:</div>
+      <div class="math-box">
+        <div class="math-line"><span class="math-label">Volume</span><span class="math-value">100,000 leads</span></div>
+        <div class="math-line"><span class="math-label">As raw aged data ($0.50)</span><span class="math-value positive">$50,000</span></div>
+        <div class="math-line"><span class="math-label">As aged MCA leads ($2.00)</span><span class="math-value positive">$200,000</span></div>
+        <div class="math-line total"><span>As fresh submissions ($20)</span><span class="math-value positive">$2,000,000</span></div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:0.75rem;">Recency is the primary value driver. Same data, 40x more revenue when fresh.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPLIANCE -->
+<section id="compliance">
+  <div class="section-label">Legal & Compliance</div>
+  <h2>Regulatory Framework</h2>
+  <p class="section-sub">Three compliance domains: alternative lending, investor securities, and data privacy.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="compliance-item">
+        <div class="compliance-icon">⚖</div>
+        <div>
+          <h4>Regulation D (Investor Side)</h4>
+          <p>506(b) allows up to 35 non-accredited sophisticated investors, no general solicitation. 506(c) allows general solicitation but requires verified accreditation. Form D filed with SEC within 15 days of first investor sale.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">📋</div>
+        <div>
+          <h4>MCA Disclosure (CA, NY, VT, VA, UT)</h4>
+          <p>MCA is a purchase of future receivables, not a loan — but CA SB 1235 and NY Commercial Finance Disclosure Law require APR-equivalent disclosure for CA and NY applicants. Computed and displayed at /apply/review.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">🏦</div>
+        <div>
+          <h4>KYB / AML / BSA</h4>
+          <p>EIN verification, OFAC screening, beneficial ownership checks via Middesk or Persona. Required before any direct loan funding. Results stored on businesses table.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">🔐</div>
+        <div>
+          <h4>ACH Authorization</h4>
+          <p>All borrowers must sign ACH debit authorization before repayments begin. Signed mandate logged with timestamp on funded_loans table. Never initiate debit without signed mandate.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="compliance-item">
+        <div class="compliance-icon">🛡</div>
+        <div>
+          <h4>Data Encryption</h4>
+          <p>Plaid access tokens encrypted via Supabase Vault (pgsodium). SSN stored as last-4 only unless full storage required (then Vault-encrypted). AES-256 at rest, TLS 1.2+ in transit.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">👤</div>
+        <div>
+          <h4>PII Handling</h4>
+          <p>Borrower PII never logged in lead_events or crm_activities. Marketplace lead_data_snapshot scrubbed of Plaid tokens, SSN, and internal routing data. Stale leads anonymized after 3 years via pg_cron.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">🔒</div>
+        <div>
+          <h4>Auth & MFA</h4>
+          <p>MFA enforced for admin and investor roles. Two-layer enforcement: Next.js middleware (route-level) + Supabase RLS (query-level). Service-role key never in client bundles.</p>
+        </div>
+      </div>
+      <div class="compliance-item">
+        <div class="compliance-icon">📊</div>
+        <div>
+          <h4>Rate Limiting & API Security</h4>
+          <p>Public /api/leads limited to 10 req/min per IP via Vercel Edge Middleware. External buyer API: 100 req/min per API key. Stripe and Plaid webhooks verified via signing secrets.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section>
+  <div class="section-label">Technology</div>
+  <h2>Tech Stack</h2>
+  <p class="section-sub">Proven, composable, and deployable in days — not months.</p>
+
+  <div class="grid-5">
+    <div class="tech-item">
+      <div class="tech-name">Next.js 15</div>
+      <div class="tech-role">App Router, Server Components, API Routes</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Supabase</div>
+      <div class="tech-role">Postgres, Auth, RLS, Vault, Realtime, Storage, Edge Functions</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Vercel</div>
+      <div class="tech-role">Deployment, Edge Middleware, Rate Limiting</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Plaid</div>
+      <div class="tech-role">Bank Verification, Transaction Sync, ACH Setup</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Stripe</div>
+      <div class="tech-role">Payments, ACH Debits, Payouts</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Resend</div>
+      <div class="tech-role">Transactional Email, React Email Templates</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Middesk</div>
+      <div class="tech-role">KYB, OFAC, Business Verification</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">pg_cron</div>
+      <div class="tech-role">Lead Aging, Statements, Repayment Queue</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Tailwind CSS</div>
+      <div class="tech-role">UI Styling</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">TypeScript</div>
+      <div class="tech-role">End-to-end type safety</div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILD PHASES -->
+<section id="phases">
+  <div class="section-label">Roadmap</div>
+  <h2>Build Phases</h2>
+  <p class="section-sub">Ship revenue fast. Each phase is independently deployable and generates income before the next phase starts.</p>
+
+  <div class="phases">
+    <div class="phase">
+      <div class="phase-num">Phase 1 — Foundation</div>
+      <h3>Lead Machine</h3>
+      <ul>
+        <li>Public application form</li>
+        <li>Plaid bank connection</li>
+        <li>Lead qualification engine</li>
+        <li>Tier assignment</li>
+        <li>Basic CRM for reps</li>
+        <li>Broker partner routing</li>
+        <li>Email notifications</li>
+      </ul>
+      <div style="margin-top:1rem;" class="tag tag-green">Revenue: Lead resale + broker commissions</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 2 — Marketplace</div>
+      <h3>Data Market</h3>
+      <ul>
+        <li>Marketplace listings engine</li>
+        <li>Buyer registration + API keys</li>
+        <li>Stripe buyer billing</li>
+        <li>Lead data delivery</li>
+        <li>Buyer webhook push</li>
+        <li>Pricing formula live</li>
+        <li>Admin listing management</li>
+      </ul>
+      <div style="margin-top:1rem;" class="tag tag-purple">Revenue: B2B lead sales</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 3 — Capital</div>
+      <h3>Investor Portal</h3>
+      <ul>
+        <li>Investor onboarding</li>
+        <li>Accreditation workflow</li>
+        <li>Subscription agreement</li>
+        <li>Stripe ACH deposits</li>
+        <li>Capital deployment (manual)</li>
+        <li>Return attribution</li>
+        <li>Monthly statements</li>
+      </ul>
+      <div style="margin-top:1rem;" class="tag tag-gold">Revenue: Direct lending spread</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 4 — Scale</div>
+      <h3>Automation</h3>
+      <ul>
+        <li>Auto capital allocation engine</li>
+        <li>Lender API integrations</li>
+        <li>Programmatic routing rules UI</li>
+        <li>Advanced CRM analytics</li>
+        <li>Parallel Markets accreditation</li>
+        <li>Cohort performance reporting</li>
+        <li>SEO content engine</li>
+      </ul>
+      <div style="margin-top:1rem;" class="tag tag-blue">Goal: $10M+/mo origination</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="color:var(--gold);font-weight:600;margin-bottom:0.5rem;">Skyline Capital Group — skylinecaps.com</div>
+  Confidential. Internal architecture document. Not for distribution.
+</footer>
+
+</body>
+</html>

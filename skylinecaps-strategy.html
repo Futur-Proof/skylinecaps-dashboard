@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyline Capital — Strategy & Pipeline</title>
+<style>
+  :root {
+    --bg: #F8F7F4;
+    --bg2: #FFFFFF;
+    --card: #FFFFFF;
+    --border: #E2E0D8;
+    --border2: #D4D0C8;
+    --gold: #A8832A;
+    --gold-light: #C9A84C;
+    --gold-bg: #FBF6EC;
+    --text: #1A1A1A;
+    --text2: #3D3D3D;
+    --muted: #7A7570;
+    --green: #2A7A4B;
+    --green-bg: #EDF7F2;
+    --blue: #1E5FAA;
+    --blue-bg: #EDF3FA;
+    --purple: #6B3FA0;
+    --purple-bg: #F4EFFA;
+    --red: #B83232;
+    --red-bg: #FEF2F2;
+    --orange: #B85A1A;
+    --orange-bg: #FEF4EC;
+    --silver: #5A6070;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(248,247,244,0.97);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+  }
+  .nav-brand {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 1rem 0;
+    white-space: nowrap;
+    margin-right: 2rem;
+    flex-shrink: 0;
+  }
+  nav ul {
+    display: flex;
+    list-style: none;
+    overflow-x: auto;
+  }
+  nav ul li a {
+    display: block;
+    padding: 1rem 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  nav ul li a:hover { color: var(--gold); border-bottom-color: var(--gold-light); }
+
+  /* HERO */
+  .hero {
+    padding: 7rem 2rem 5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .eyebrow-line { width: 32px; height: 2px; background: var(--gold-light); }
+  .eyebrow-text { font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  h1 {
+    font-size: clamp(2rem, 5.5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.08;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  h1 em { color: var(--gold); font-style: normal; }
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 540px;
+    margin-bottom: 3rem;
+    line-height: 1.75;
+  }
+  .kpi-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .kpi {
+    flex: 1;
+    padding: 1.25rem 1.5rem;
+    border-right: 1px solid var(--border);
+  }
+  .kpi:last-child { border-right: none; }
+  .kpi-value { font-size: 1.5rem; font-weight: 800; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
+  .kpi-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* SECTIONS */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .sec-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .sec-sub { color: var(--muted); font-size: 0.87rem; margin-bottom: 2.5rem; line-height: 1.6; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .card-gold { border-top: 3px solid var(--gold-light); }
+  .card-blue { border-top: 3px solid var(--blue); }
+  .card-green { border-top: 3px solid var(--green); }
+  .card-purple { border-top: 3px solid var(--purple); }
+  .card-silver { border-top: 3px solid var(--silver); }
+  .card-orange { border-top: 3px solid var(--orange); }
+
+  /* GRIDS */
+  .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+  .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+  .g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text); }
+  h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--text); }
+  p { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+
+  /* BADGE */
+  .badge {
+    font-size: 0.64rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+  .badge-gold { background: var(--gold-bg); color: var(--gold); border: 1px solid #D4B870; }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #B0D9C2; }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid #A8C4E8; }
+  .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid #F0BABA; }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid #C8AEED; }
+  .badge-silver { background: #F0F0F0; color: var(--silver); border: 1px solid #D0D0D8; }
+  .badge-orange { background: var(--orange-bg); color: var(--orange); border: 1px solid #E8C4A0; }
+
+  /* OPPORTUNITY BARS */
+  .opp-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .opp-label { font-size: 0.82rem; width: 200px; flex-shrink: 0; color: var(--text2); }
+  .opp-track {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .opp-fill { height: 100%; background: var(--gold-light); border-radius: 3px; }
+  .opp-val { font-size: 0.78rem; color: var(--gold); font-weight: 600; width: 80px; text-align: right; flex-shrink: 0; }
+
+  /* FLYWHEEL */
+  .flywheel {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    gap: 0;
+    padding: 0.5rem 0;
+  }
+  .fw-node {
+    flex-shrink: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    text-align: center;
+    min-width: 110px;
+  }
+  .fw-node-label { font-size: 0.72rem; color: var(--muted); line-height: 1.4; font-weight: 500; }
+  .fw-node-title { font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+  .fw-node.accent { border-color: var(--gold-light); background: var(--gold-bg); }
+  .fw-node.accent .fw-node-title { color: var(--gold); }
+  .fw-node.result { border-color: #B0D9C2; background: var(--green-bg); }
+  .fw-node.result .fw-node-title { color: var(--green); }
+  .fw-arrow { flex-shrink: 0; color: var(--gold-light); font-size: 1rem; padding: 0 0.25rem; font-weight: 700; }
+
+  /* LEAD SOURCES */
+  .source {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .source-rank {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .source-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+  .source-desc { font-size: 0.79rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.55; }
+  .source-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  /* PIPELINE STAGES */
+  .pipeline-stages {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    min-width: 700px;
+  }
+  .ps {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 0.6rem;
+    text-align: center;
+  }
+  .ps-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+  }
+  .ps-name { font-size: 0.68rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text2); }
+  .ps-action { font-size: 0.63rem; color: var(--muted); line-height: 1.3; }
+
+  /* KEYWORDS */
+  .kw-section { margin-bottom: 2rem; }
+  .kw-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .kw-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .kw {
+    font-size: 0.75rem;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    padding: 0.28rem 0.6rem;
+    border-radius: 4px;
+    color: var(--text2);
+    transition: border-color 0.15s, background 0.15s;
+    cursor: default;
+  }
+  .kw:hover { border-color: var(--gold-light); background: var(--gold-bg); color: var(--gold); }
+  .kw.hot { border-color: #F0BABA; background: #FEF8F8; }
+  .kw.warm { border-color: #E8C4A0; background: #FEFAF6; }
+  .kw.cold { border-color: #A8C4E8; background: #F4F8FD; }
+
+  /* COMPETITOR TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .comp-table th {
+    text-align: left;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.8rem 1rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .comp-table td {
+    font-size: 0.82rem;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr.skyline td { background: var(--gold-bg); }
+  .comp-name { font-weight: 700; color: var(--text); }
+  .comp-sub { font-size: 0.7rem; color: var(--muted); font-weight: 400; }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+  .partial { color: var(--orange); font-weight: 700; }
+
+  /* REVENUE STREAMS */
+  .rev-stream {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 0;
+  }
+  .rev-stream:last-child { border-bottom: none; }
+  .rev-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+  }
+  .rev-name { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+  .rev-range { font-size: 0.85rem; color: var(--gold); font-weight: 700; white-space: nowrap; }
+  .rev-desc { font-size: 0.79rem; color: var(--muted); max-width: 580px; line-height: 1.55; }
+  .rev-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 0.6rem; }
+  .rev-bar-fill { height: 100%; background: var(--gold-light); border-radius: 2px; }
+
+  /* MATH */
+  .math {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+  }
+  .math-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    color: var(--muted);
+    gap: 1rem;
+  }
+  .math-row span:last-child { color: var(--text2); font-weight: 500; white-space: nowrap; }
+  .math-row.total {
+    border-top: 1px solid var(--border2);
+    margin-top: 0.4rem;
+    padding-top: 0.7rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .math-row.total span:last-child { color: var(--green); }
+  .math-row.deduct span:last-child { color: var(--red); }
+
+  /* FUNNEL */
+  .funnel { max-width: 480px; margin: 0 auto; }
+  .funnel-step { margin-bottom: 3px; }
+  .funnel-inner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    margin: 0 auto;
+    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .funnel-label { font-size: 0.8rem; color: var(--text2); }
+  .funnel-num { font-size: 0.82rem; color: var(--gold); font-weight: 700; }
+  .funnel-drop { text-align: center; font-size: 0.63rem; color: var(--muted); padding: 0.15rem 0; }
+
+  /* GTM TABLE */
+  .gtm-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .gtm-row:last-child { border-bottom: none; }
+  .gtm-phase { font-size: 0.72rem; font-weight: 700; color: var(--text2); line-height: 1.4; }
+  .gtm-phase-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.2rem; }
+  .gtm-detail { font-size: 0.8rem; color: var(--muted); line-height: 1.65; }
+  .gtm-detail strong { color: var(--text2); font-weight: 600; }
+
+  /* PHASES */
+  .phase-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 120px;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .phase-row:last-child { border-bottom: none; }
+  .phase-tag {
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-bg);
+    border: 1px solid #D4B870;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .phase-content h4 { margin-bottom: 0.4rem; font-size: 0.9rem; }
+  .phase-content ul { list-style: none; padding: 0; }
+  .phase-content ul li {
+    font-size: 0.79rem;
+    color: var(--muted);
+    padding: 0.15rem 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+  .phase-content ul li::before { content: '+'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .phase-rev { text-align: right; }
+  .phase-rev-label { font-size: 0.63rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+  .phase-rev-value { font-size: 0.95rem; font-weight: 800; color: var(--gold); }
+
+  /* INDUSTRY CARDS */
+  .industry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .industry-name { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text); }
+  .industry-why { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.55; }
+  .industry-stats { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  /* FUTURPROOF LABS SECTION */
+  .fp-header {
+    background: var(--text);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .fp-logo-wrap { flex-shrink: 0; }
+  .fp-logo-wrap img { height: 36px; display: block; }
+  .fp-header-text { flex: 1; }
+  .fp-header-title { font-size: 1.1rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.3rem; }
+  .fp-header-sub { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+  .fp-services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .fp-service {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    border-left: 3px solid var(--text);
+  }
+  .fp-service h4 { font-size: 0.85rem; margin-bottom: 0.35rem; }
+  .fp-service p { font-size: 0.77rem; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8em;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    color: var(--gold);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footer-left { font-size: 0.78rem; color: var(--muted); }
+  .footer-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
+  .footer-right img { height: 28px; opacity: 0.5; }
+
+  @media (max-width: 700px) {
+    .kpi-row { flex-direction: column; }
+    .kpi { border-right: none; border-bottom: 1px solid var(--border); }
+    .kpi:last-child { border-bottom: none; }
+    .phase-row { grid-template-columns: 1fr; }
+    .phase-rev { text-align: left; }
+    .gtm-row { grid-template-columns: 1fr; }
+    .fp-header { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Skyline Capital</div>
+  <ul>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#flywheel">Flywheel</a></li>
+    <li><a href="#sources">Lead Sources</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#keywords">Keywords</a></li>
+    <li><a href="#targeting">Industries</a></li>
+    <li><a href="#revenue">Revenue</a></li>
+    <li><a href="#gtm">Build Plan</a></li>
+    <li><a href="#competitors">Competitors</a></li>
+    <li><a href="#phases">Phases</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <div class="eyebrow-line"></div>
+    <span class="eyebrow-text">Strategy and Pipeline — Confidential</span>
+  </div>
+  <h1>Own the Lead.<br>Work It <em>Three Ways.</em><br>Beat LendingTree.</h1>
+  <p class="hero-sub">The SMB alternative lending market is fragmented, expensive, and dominated by lead resellers. Skyline originates, brokers, and lends directly — all from one lead.</p>
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-value">$50B+</div>
+      <div class="kpi-label">US Alt Lending Market</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-value">7.3M</div>
+      <div class="kpi-label">LendingTree Visits/Mo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-value">$135</div>
+      <div class="kpi-label">Avg Market Cost Per Lead</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-value">$0</div>
+      <div class="kpi-label">Target Net Lead Cost</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-value">3 to 5x</div>
+      <div class="kpi-label">Times Same Lead Monetized</div>
+    </div>
+  </div>
+</div>
+
+<!-- MARKET -->
+<section id="market">
+  <div class="sec-label">Market Opportunity</div>
+  <h2>Why Now</h2>
+  <p class="sec-sub">Big banks are tightening A-paper standards. Every restriction they add expands the B-paper market. The incumbents are all lead resellers — nobody owns the full stack.</p>
+
+  <div class="g2" style="margin-bottom:2rem;">
+    <div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:1.25rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Market Size by Segment</div>
+      <div class="opp-bar">
+        <div class="opp-label">MCA / Revenue-Based</div>
+        <div class="opp-track"><div class="opp-fill" style="width:85%"></div></div>
+        <div class="opp-val">$20B+/yr</div>
+      </div>
+      <div class="opp-bar">
+        <div class="opp-label">Short-Term Business Loans</div>
+        <div class="opp-track"><div class="opp-fill" style="width:70%"></div></div>
+        <div class="opp-val">$15B+/yr</div>
+      </div>
+      <div class="opp-bar">
+        <div class="opp-label">Business Lines of Credit</div>
+        <div class="opp-track"><div class="opp-fill" style="width:60%"></div></div>
+        <div class="opp-val">$12B+/yr</div>
+      </div>
+      <div class="opp-bar">
+        <div class="opp-label">Equipment Finance</div>
+        <div class="opp-track"><div class="opp-fill" style="width:30%"></div></div>
+        <div class="opp-val">$5B+/yr</div>
+      </div>
+      <div class="opp-bar">
+        <div class="opp-label">Invoice / AR Financing</div>
+        <div class="opp-track"><div class="opp-fill" style="width:20%"></div></div>
+        <div class="opp-val">$3B+/yr</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:1.25rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Who Owns the Market and What They Miss</div>
+      <div style="font-size:0.83rem;color:var(--muted);line-height:2.3;">
+        <div><span style="color:var(--text);font-weight:600;">Chase / AmEx / PayPal / Shopify</span> — A-paper only. Anything below their threshold is a decline and a wasted lead.</div>
+        <div><span style="color:var(--text);font-weight:600;">LendingTree / BusinessLoans.com</span> — Pure lead resellers. They do not broker. They do not lend. One revenue stream.</div>
+        <div><span style="color:var(--text);font-weight:600;">OnDeck / Bluevine / Fundbox</span> — Direct lenders but not brokers. Declines go to waste or get sold cheap.</div>
+        <div><span style="color:var(--text);font-weight:600;">ISO Shops</span> — Brokers only. Buy data from others. No origination, no lending, no marketplace.</div>
+        <div style="margin-top:0.75rem;padding:0.85rem 1rem;background:var(--gold-bg);border-left:3px solid var(--gold-light);border-radius:4px;color:var(--text2);font-weight:500;">Skyline: Originates, brokers, lends directly, and sells the rest. Every layer. No wasted lead.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLYWHEEL -->
+<section id="flywheel">
+  <div class="sec-label">The Core Model</div>
+  <h2>The Revenue Flywheel</h2>
+  <p class="sec-sub">Each revolution compounds. As lending volume grows, investor capital grows. As data volume grows, marketplace revenue grows. Lead acquisition cost trends toward zero.</p>
+
+  <div style="overflow-x:auto;padding:0.5rem 0;margin-bottom:2rem;">
+    <div class="flywheel">
+      <div class="fw-node">
+        <div class="fw-node-title">Lead In</div>
+        <div class="fw-node-label">Inbound via SEO, ads, referral</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node accent">
+        <div class="fw-node-title">Qualify and Tier</div>
+        <div class="fw-node-label">12mo gate, $50K/mo deposits</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node">
+        <div class="fw-node-title">Gold: Fund Direct</div>
+        <div class="fw-node-label">30 to 50% return, 6 to 8 months</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node">
+        <div class="fw-node-title">Investors Earn</div>
+        <div class="fw-node-label">20 to 25% target return</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node">
+        <div class="fw-node-title">Silver: Broker</div>
+        <div class="fw-node-label">8 to 12% commission</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node">
+        <div class="fw-node-title">Bronze: Marketplace</div>
+        <div class="fw-node-label">Sold 3 to 5x, $0.50 to $200</div>
+      </div>
+      <div class="fw-arrow">+</div>
+      <div class="fw-node result">
+        <div class="fw-node-title">Net Lead Cost: $0</div>
+        <div class="fw-node-label">Resale covers acquisition</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card card-gold">
+      <h3>The Arbitrage</h3>
+      <p>Buy aged leads at $1 to $3. Work the best as broker deals and earn $10K commission. Fund the cream directly for 30 to 50% returns. Resell leftovers at $1 to $3. The resale covers acquisition cost. Everything else is margin.</p>
+    </div>
+    <div class="card card-blue">
+      <h3>The Moat</h3>
+      <p>ISO shops buy data. LendingTree sells data. Nobody does both plus direct lending. The more data Skyline originates, the better the marketplace becomes. The better the lending book, the more investors join. Compounding moats at every layer.</p>
+    </div>
+    <div class="card card-green">
+      <h3>The Durability</h3>
+      <p>When Chase tightens, B-paper expands. When PayPal declines 100K leads, those leads need somewhere to go. Every time big banks get more restrictive, Skyline's addressable market grows larger.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LEAD SOURCES -->
+<section id="sources">
+  <div class="sec-label">Lead Generation</div>
+  <h2>Best Lead Sources</h2>
+  <p class="sec-sub">Ranked by lead quality and conversion potential. The goal is to originate instead of buy — and monetize everything you do not convert.</p>
+
+  <div class="g2">
+    <div class="source">
+      <div class="source-rank">Source 01</div>
+      <div class="source-name">Google Search — Paid and Organic</div>
+      <div class="source-desc">Someone typing "business loan 250k fast" or "working capital no tax return" is raising their hand in real time. Highest purchase intent in the market. Most competitive and most expensive — but the highest close rate by far.</div>
+      <div class="source-meta">
+        <span class="badge badge-red">Highest Intent</span>
+        <span class="badge badge-orange">$15 to $50 CPC</span>
+        <span class="badge badge-gold">Gold and Silver leads</span>
+        <span class="badge badge-blue">15 to 25% close rate</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 02</div>
+      <div class="source-name">YouTube Educational Content</div>
+      <div class="source-desc">Target business owners watching content about cash flow, payroll problems, and growth. Run educational content such as "how to get funded without tax returns." People who watch 60%+ are pre-sold before they apply. Lower CPM, pre-qualified audience.</div>
+      <div class="source-meta">
+        <span class="badge badge-orange">High Intent</span>
+        <span class="badge badge-green">Lower CPM</span>
+        <span class="badge badge-blue">Pre-qualified</span>
+        <span class="badge badge-silver">Silver and Gold leads</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 03</div>
+      <div class="source-name">Declined Lead Buyback from Funders</div>
+      <div class="source-desc">OnDeck, Bluevine, Fundbox, and Kabbage all decline thousands of deals monthly — too small, wrong state, or wrong industry for their model. Buy those declined pipelines cheap. They already went through an application process so data quality is high.</div>
+      <div class="source-meta">
+        <span class="badge badge-gold">High Data Quality</span>
+        <span class="badge badge-green">$0.50 to $5 per lead</span>
+        <span class="badge badge-blue">Already applied</span>
+        <span class="badge badge-silver">Silver and Bronze</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 04</div>
+      <div class="source-name">Referral Partner Network</div>
+      <div class="source-desc">Accountants, bookkeepers, payroll companies, and commercial insurance brokers. When their clients need cash they call them first. One good accountant partner sends 2 to 4 warm deals a month on autopilot. Split commission to keep them incentivized.</div>
+      <div class="source-meta">
+        <span class="badge badge-gold">Highest Quality</span>
+        <span class="badge badge-green">$0 acquisition cost</span>
+        <span class="badge badge-orange">Gold leads only</span>
+        <span class="badge badge-purple">Trust-based</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 05</div>
+      <div class="source-name">UCC Filing Lists</div>
+      <div class="source-desc">Every MCA deal creates a public UCC-1 filing. Businesses with UCC filings have already taken MCA — they understand the product, are in the market, and may need a renewal or a better rate. Buy lists of UCC filers by state and industry for pennies.</div>
+      <div class="source-meta">
+        <span class="badge badge-green">Pennies per lead</span>
+        <span class="badge badge-blue">Public data</span>
+        <span class="badge badge-silver">Product-aware</span>
+        <span class="badge badge-orange">Bronze to Silver</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 06</div>
+      <div class="source-name">SBA Decline Pipeline</div>
+      <div class="source-desc">Businesses that applied for SBA loans and got turned down tried the bank route and failed. They need money, they have started the process, and they are now open to alternatives. Hard data to find but extremely high conversion once sourced.</div>
+      <div class="source-meta">
+        <span class="badge badge-gold">High Intent</span>
+        <span class="badge badge-red">Hard to source</span>
+        <span class="badge badge-orange">Gold leads</span>
+        <span class="badge badge-blue">Bank-qualified profile</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 07</div>
+      <div class="source-name">LinkedIn B2B Targeting</div>
+      <div class="source-desc">Target CFOs, Controllers, and owners in construction, healthcare, trucking, and restaurants by company size and industry. Lower direct intent — better for building retargeting audiences and top-of-funnel awareness that feeds Google and YouTube remarketing pools.</div>
+      <div class="source-meta">
+        <span class="badge badge-blue">Retargeting seed</span>
+        <span class="badge badge-silver">Awareness stage</span>
+        <span class="badge badge-orange">Higher CPL</span>
+        <span class="badge badge-purple">Gold audience build</span>
+      </div>
+    </div>
+    <div class="source">
+      <div class="source-rank">Source 08</div>
+      <div class="source-name">SEO Content Engine</div>
+      <div class="source-desc">Own search rankings for every industry-specific loan keyword: "construction company working capital," "restaurant business loan no tax return." Slow to build but once ranked it is free traffic that compounds. Domain authority grows with every page published.</div>
+      <div class="source-meta">
+        <span class="badge badge-green">$0 per click (long term)</span>
+        <span class="badge badge-purple">Compounding asset</span>
+        <span class="badge badge-blue">All tiers</span>
+        <span class="badge badge-orange">6 to 12 months to rank</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section id="pipeline">
+  <div class="sec-label">Sales Pipeline</div>
+  <h2>Lead-to-Funded Pipeline</h2>
+  <p class="sec-sub">Seven stages. Each stage has a defined action, an owner, and an automated email to the borrower. Nothing falls through without a logged reason.</p>
+
+  <div style="overflow-x:auto;margin-bottom:2rem;">
+    <div class="pipeline-stages">
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--muted);"></div>
+        <div class="ps-name">New Lead</div>
+        <div class="ps-action">Tier assigned. Rep notified instantly.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--blue);"></div>
+        <div class="ps-name">Contacted</div>
+        <div class="ps-action">Call logged. Next follow-up set.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--orange);"></div>
+        <div class="ps-name">Docs Requested</div>
+        <div class="ps-action">Plaid link or statements requested.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--purple);"></div>
+        <div class="ps-name">Docs Received</div>
+        <div class="ps-action">Package reviewed. Offer built.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--gold-light);"></div>
+        <div class="ps-name">Submitted</div>
+        <div class="ps-action">Sent to lender or internal desk.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:#B8A060;"></div>
+        <div class="ps-name">Approved</div>
+        <div class="ps-action">Offer presented. ACH auth signed.</div>
+      </div>
+      <div class="ps">
+        <div class="ps-dot" style="background:var(--green);"></div>
+        <div class="ps-name">Funded</div>
+        <div class="ps-action">Wire sent. Commission logged.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Conversion Funnel — Industry Benchmarks</div>
+      <div class="funnel">
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:100%;">
+            <div class="funnel-label">Leads Generated</div>
+            <div class="funnel-num">1,000</div>
+          </div>
+        </div>
+        <div class="funnel-drop">65% pass qualification gate</div>
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:90%;">
+            <div class="funnel-label">Pass 12-Month / $50K Gate</div>
+            <div class="funnel-num">650</div>
+          </div>
+        </div>
+        <div class="funnel-drop">60% respond to outreach</div>
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:78%;">
+            <div class="funnel-label">Initial Contact Made</div>
+            <div class="funnel-num">390</div>
+          </div>
+        </div>
+        <div class="funnel-drop">50% submit docs</div>
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:64%;">
+            <div class="funnel-label">Docs Submitted</div>
+            <div class="funnel-num">195</div>
+          </div>
+        </div>
+        <div class="funnel-drop">70% get approved</div>
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:50%;">
+            <div class="funnel-label">Approved</div>
+            <div class="funnel-num">136</div>
+          </div>
+        </div>
+        <div class="funnel-drop">80% accept offer</div>
+        <div class="funnel-step">
+          <div class="funnel-inner" style="width:38%;border-color:var(--gold-light);background:var(--gold-bg);">
+            <div class="funnel-label" style="color:var(--gold);font-weight:600;">Funded</div>
+            <div class="funnel-num">109 of 1,000</div>
+          </div>
+        </div>
+        <div class="funnel-drop" style="color:var(--green);font-weight:600;">10.9% of all leads reach funded</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">What Happens to the Other 891 Leads</div>
+      <div class="card" style="margin-bottom:0.75rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;gap:0.5rem;">
+          <div style="font-size:0.85rem;font-weight:700;">350 did not qualify</div>
+          <span class="badge badge-purple">Marketplace — Bronze</span>
+        </div>
+        <p>Auto-listed as aged data at $0.50 to $3 each. Sold to MCA shops. Revenue: $175 to $1,050.</p>
+      </div>
+      <div class="card" style="margin-bottom:0.75rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;gap:0.5rem;">
+          <div style="font-size:0.85rem;font-weight:700;">260 no response</div>
+          <span class="badge badge-silver">Aged — Marketplace</span>
+        </div>
+        <p>After 72 hours no response, listed as aged leads at $0.50 to $2 each. Revenue: $130 to $520.</p>
+      </div>
+      <div class="card" style="margin-bottom:0.75rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;gap:0.5rem;">
+          <div style="font-size:0.85rem;font-weight:700;">195 no docs submitted</div>
+          <span class="badge badge-orange">Fresh — Marketplace</span>
+        </div>
+        <p>Have contact info, partially qualified. Fresh listing at $15 to $25 each. Revenue: $2,925 to $4,875.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;gap:0.5rem;">
+          <div style="font-size:0.85rem;font-weight:700;">86 declined or no accept</div>
+          <span class="badge badge-blue">Real-Time — Resell</span>
+        </div>
+        <p>Fully qualified, docs in, did not close. Most valuable resale asset. $45 to $150 each. Revenue: $3,870 to $12,900.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEYWORDS -->
+<section id="keywords">
+  <div class="sec-label">SEMrush Strategy</div>
+  <h2>Keyword Targets</h2>
+  <p class="sec-sub">Plug these into SEMrush Keyword Magic Tool. Filter keyword difficulty under 60, volume over 500 per month. Run Keyword Gap against LendingTree, OnDeck, and Bluevine to find every opening they rank for that you do not.</p>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>High Intent — Direct Loan Searchers (Gold Leads)</span>
+      <span class="badge badge-red">Hottest Intent</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw hot">business loan fast approval</div>
+      <div class="kw hot">small business loan same day funding</div>
+      <div class="kw hot">business loan no tax return</div>
+      <div class="kw hot">working capital loan fast</div>
+      <div class="kw hot">business line of credit fast approval</div>
+      <div class="kw hot">merchant cash advance apply</div>
+      <div class="kw hot">MCA loan apply online</div>
+      <div class="kw hot">quick business funding</div>
+      <div class="kw hot">business loan 24 hours</div>
+      <div class="kw hot">emergency business loan</div>
+      <div class="kw hot">same day business funding</div>
+      <div class="kw hot">business loan instant approval</div>
+      <div class="kw hot">short term business loan fast</div>
+      <div class="kw hot">business cash advance no credit check</div>
+      <div class="kw hot">working capital same day</div>
+    </div>
+  </div>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>Amount-Specific — Gold Tier Targets ($250K+)</span>
+      <span class="badge badge-gold">Gold Tier</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw warm">business loan 250000</div>
+      <div class="kw warm">250k business loan</div>
+      <div class="kw warm">business loan 500k</div>
+      <div class="kw warm">500000 business loan</div>
+      <div class="kw warm">business loan 1 million</div>
+      <div class="kw warm">commercial loan 500k no bank</div>
+      <div class="kw warm">working capital 250k</div>
+      <div class="kw warm">business funding 300000</div>
+      <div class="kw warm">large business loan fast approval</div>
+      <div class="kw warm">business line of credit 500k</div>
+      <div class="kw warm">unsecured business loan 250k</div>
+      <div class="kw warm">business loan 200k fast</div>
+    </div>
+  </div>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>Problem-Aware — Cash Flow Pain Points (High Volume)</span>
+      <span class="badge badge-orange">High Volume</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw warm">how to get business cash fast</div>
+      <div class="kw warm">business cash flow problem solution</div>
+      <div class="kw warm">payroll funding for small business</div>
+      <div class="kw warm">invoice financing small business</div>
+      <div class="kw warm">business cash advance for payroll</div>
+      <div class="kw warm">working capital for construction company</div>
+      <div class="kw warm">how to get working capital fast</div>
+      <div class="kw warm">business owner need money fast</div>
+      <div class="kw warm">bridge loan for business</div>
+      <div class="kw warm">funding gap business</div>
+      <div class="kw warm">business cash crunch solution</div>
+      <div class="kw warm">can't make payroll small business</div>
+    </div>
+  </div>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>Qualification-Specific — Product-Aware Searchers</span>
+      <span class="badge badge-blue">High Convert</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw cold">business loan with bank statements only</div>
+      <div class="kw cold">business loan no tax return required</div>
+      <div class="kw cold">merchant cash advance 12 months in business</div>
+      <div class="kw cold">business loan based on deposits</div>
+      <div class="kw cold">business funding based on bank statements</div>
+      <div class="kw cold">MCA daily payments</div>
+      <div class="kw cold">factor rate business loan</div>
+      <div class="kw cold">business loan no collateral</div>
+      <div class="kw cold">unsecured business loan fast</div>
+      <div class="kw cold">business loan 50000 month revenue</div>
+      <div class="kw cold">business advance based on revenue</div>
+      <div class="kw cold">purchase of future receivables</div>
+    </div>
+  </div>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>Industry-Specific — Target Verticals (Lower CPC)</span>
+      <span class="badge badge-purple">Lower Competition</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw cold">construction company working capital loan</div>
+      <div class="kw cold">restaurant business loan no tax return</div>
+      <div class="kw cold">trucking company loan fast</div>
+      <div class="kw cold">landscaping business loan</div>
+      <div class="kw cold">healthcare practice loan</div>
+      <div class="kw cold">medical office working capital</div>
+      <div class="kw cold">retail store business loan</div>
+      <div class="kw cold">supermarket business loan</div>
+      <div class="kw cold">contractor working capital</div>
+      <div class="kw cold">general contractor loan fast</div>
+      <div class="kw cold">dentist office working capital</div>
+      <div class="kw cold">auto repair shop business loan</div>
+      <div class="kw cold">salon business loan fast</div>
+      <div class="kw cold">roofing company business loan</div>
+    </div>
+  </div>
+
+  <div class="kw-section">
+    <div class="kw-title">
+      <span>Competitor Alternative Keywords</span>
+      <span class="badge badge-silver">Comparison Shopping</span>
+    </div>
+    <div class="kw-grid">
+      <div class="kw">LendingTree business loan alternative</div>
+      <div class="kw">OnDeck alternative</div>
+      <div class="kw">Kabbage alternative</div>
+      <div class="kw">Bluevine alternative</div>
+      <div class="kw">Fundbox alternative</div>
+      <div class="kw">best alternative business lender</div>
+      <div class="kw">alternative to bank business loan</div>
+      <div class="kw">non bank business loan</div>
+      <div class="kw">private business lender</div>
+      <div class="kw">better than ondeck</div>
+      <div class="kw">businessloans.com alternative</div>
+    </div>
+  </div>
+
+  <div class="card card-gold" style="margin-top:1.5rem;">
+    <h4 style="margin-bottom:0.75rem;">SEMrush Action Steps</h4>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;">
+      <div style="font-size:0.79rem;color:var(--muted);line-height:1.65;"><span style="color:var(--text2);font-weight:600;">1. Keyword Magic Tool</span><br>Filter KD under 60, volume over 500 per month. Export the buildable SEO list first.</div>
+      <div style="font-size:0.79rem;color:var(--muted);line-height:1.65;"><span style="color:var(--text2);font-weight:600;">2. Keyword Gap</span><br>Compare against lendingtree.com, ondeck.com, bluevine.com. Every gap is an opening.</div>
+      <div style="font-size:0.79rem;color:var(--muted);line-height:1.65;"><span style="color:var(--text2);font-weight:600;">3. Traffic Analytics</span><br>Run lendingtree.com/business-loans specifically, not the whole domain. Isolate the SMB segment.</div>
+      <div style="font-size:0.79rem;color:var(--muted);line-height:1.65;"><span style="color:var(--text2);font-weight:600;">4. Advertising Research</span><br>Pull ondeck.com and bluevine.com paid keyword lists. That is your Google Ads starter set.</div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section id="targeting">
+  <div class="sec-label">Industry Targeting</div>
+  <h2>Best Verticals to Own</h2>
+  <p class="sec-sub">These industries have recurring capital needs, high average monthly deposits, and strong urgency around speed. They get turned down by banks for reasons that have nothing to do with their cash flow.</p>
+
+  <div class="g3">
+    <div class="industry-card">
+      <div class="industry-name">Construction</div>
+      <div class="industry-why">Gets paid in 30 days, paid in 60. Always has a new job to bid on. Cash-rich but timing-poor. Has $300K sitting in the account but would rather deploy someone else's capital to keep their own dry.</div>
+      <div class="industry-stats">
+        <span class="badge badge-gold">Gold tier typical</span>
+        <span class="badge badge-green">High avg deposits</span>
+        <span class="badge badge-orange">Seasonal spikes</span>
+      </div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-name">Trucking</div>
+      <div class="industry-why">Fuel costs, maintenance, driver pay. Cash flow gaps between loads and receivables. Fleet expansion opportunities move fast. Banks dislike the asset-light model and reject viable operators constantly.</div>
+      <div class="industry-stats">
+        <span class="badge badge-blue">High frequency</span>
+        <span class="badge badge-gold">Silver to Gold</span>
+        <span class="badge badge-green">High renewal rate</span>
+      </div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-name">Restaurants</div>
+      <div class="industry-why">High daily card volume makes Plaid verification fast and clean. Seasonal swings mean capital needs are predictable. Banks reject restaurant risk profiles. MCA was practically invented for this vertical.</div>
+      <div class="industry-stats">
+        <span class="badge badge-purple">Easy to underwrite</span>
+        <span class="badge badge-silver">Silver typical</span>
+        <span class="badge badge-orange">High renewal rate</span>
+      </div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-name">Healthcare</div>
+      <div class="industry-why">Insurance reimbursement delays destroy cash flow for practices with real revenue. Dentists, med spas, urgent care centers are all profitable but have AR timing issues. High average loan size and low default rates.</div>
+      <div class="industry-stats">
+        <span class="badge badge-gold">Gold tier typical</span>
+        <span class="badge badge-blue">Educated borrowers</span>
+        <span class="badge badge-green">Low default rate</span>
+      </div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-name">Landscaping and Home Services</div>
+      <div class="industry-why">Equipment purchases, crew expansion, seasonal front-loading. Strong recurring revenue but lumpy by design. Owners are operators first, finance people never. They want fast, simple, and done.</div>
+      <div class="industry-stats">
+        <span class="badge badge-silver">Silver typical</span>
+        <span class="badge badge-orange">Seasonal demand</span>
+        <span class="badge badge-blue">High volume</span>
+      </div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-name">Retail and Supermarkets</div>
+      <div class="industry-why">Inventory timing, seasonal stock-up, expansion opportunities. High daily transaction volume makes Plaid underwriting straightforward. Grocery stores especially — massive deposits, tight margins, frequent capital needs year-round.</div>
+      <div class="industry-stats">
+        <span class="badge badge-purple">Fast Plaid verify</span>
+        <span class="badge badge-gold">High deposits</span>
+        <span class="badge badge-green">Repeat borrowers</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVENUE MODEL -->
+<section id="revenue">
+  <div class="sec-label">Revenue Model</div>
+  <h2>How Each Dollar Gets Made</h2>
+  <p class="sec-sub">Five revenue streams from a single lead. The first two are live from day one. The last three scale as volume grows.</p>
+
+  <div class="g2">
+    <div class="card">
+      <div class="rev-stream">
+        <div class="rev-header">
+          <div class="rev-name">Lead Resale — Data Marketplace</div>
+          <div class="rev-range">$0.50 to $200 per lead</div>
+        </div>
+        <div class="rev-desc">Bronze leads auto-listed. Fresh leads listed at 7 days. Fully qualified unused leads listed as real-time exclusive. Same lead sold up to five times to different buyers.</div>
+        <div class="rev-bar"><div class="rev-bar-fill" style="width:25%"></div></div>
+      </div>
+      <div class="rev-stream">
+        <div class="rev-header">
+          <div class="rev-name">Brokerage Commission</div>
+          <div class="rev-range">8 to 12% of funded amount</div>
+        </div>
+        <div class="rev-desc">Silver and Gold leads placed with lender partners. No capital deployed. Pure commission. A $100K funded deal produces $8K to $12K in the door. Ten deals per month equals $80K to $120K gross.</div>
+        <div class="rev-bar"><div class="rev-bar-fill" style="width:60%"></div></div>
+      </div>
+      <div class="rev-stream">
+        <div class="rev-header">
+          <div class="rev-name">Direct Lending Return</div>
+          <div class="rev-range">30 to 50% over 6 to 8 months</div>
+        </div>
+        <div class="rev-desc">Best Gold leads funded directly. $250K funded at 1.35 factor rate equals $337,500 total payback. Minus investor capital cost of 20 to 25%, Skyline keeps the spread as earned income.</div>
+        <div class="rev-bar"><div class="rev-bar-fill" style="width:90%"></div></div>
+      </div>
+      <div class="rev-stream">
+        <div class="rev-header">
+          <div class="rev-name">Investor Platform Fee</div>
+          <div class="rev-range">2% of returns credited</div>
+        </div>
+        <div class="rev-desc">On every repayment credited to investors, Skyline deducts a 2% platform management fee before passing through the net return.</div>
+        <div class="rev-bar"><div class="rev-bar-fill" style="width:15%"></div></div>
+      </div>
+      <div class="rev-stream" style="border-bottom:none;">
+        <div class="rev-header">
+          <div class="rev-name">Renewal Commission</div>
+          <div class="rev-range">4 to 6% on renewals</div>
+        </div>
+        <div class="rev-desc">When a funded borrower returns for a second loan — common in MCA at a 60 to 70% renewal rate — the commission is earned again with zero acquisition cost on that deal.</div>
+        <div class="rev-bar"><div class="rev-bar-fill" style="width:40%"></div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.85rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Month 6 Target — 20-Deal Month</div>
+        <div class="math">
+          <div class="math-row"><span>10 broker deals x $100K avg x 10%</span><span>$100,000</span></div>
+          <div class="math-row"><span>5 direct loans x $250K x 35% return</span><span>$437,500</span></div>
+          <div class="math-row deduct"><span>Investor cost (25% on direct loans)</span><span>-$109,375</span></div>
+          <div class="math-row"><span>Marketplace: 500 leads x $5 avg</span><span>$2,500</span></div>
+          <div class="math-row"><span>5 renewals x $80K avg x 5%</span><span>$20,000</span></div>
+          <div class="math-row total"><span>Gross Revenue</span><span>$450,625</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.85rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">At Scale — 50-Deal Month, 20 Reps</div>
+        <div class="math">
+          <div class="math-row"><span>20 broker deals x $150K x 10%</span><span>$300,000</span></div>
+          <div class="math-row"><span>15 direct loans x $300K x 35%</span><span>$1,575,000</span></div>
+          <div class="math-row deduct"><span>Investor cost (22% on direct)</span><span>-$346,500</span></div>
+          <div class="math-row"><span>Marketplace: 3,000 leads x $4 avg</span><span>$12,000</span></div>
+          <div class="math-row"><span>15 renewals x $120K x 5%</span><span>$90,000</span></div>
+          <div class="math-row total"><span>Gross Revenue</span><span>$1,630,500/mo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GTM — FUTURPROOF LABS -->
+<section id="gtm">
+  <div class="sec-label">Go-to-Market</div>
+  <h2>How We Build the Pipeline</h2>
+  <p class="sec-sub">Execution is sequenced by speed to revenue. Start with what already works. Layer in longer-term channels as cash flow allows. Built in partnership with FuturProof Labs.</p>
+
+  <div class="fp-header">
+    <div class="fp-logo-wrap">
+      <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png" alt="FuturProof Labs" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div style="display:none;font-size:1rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#FFFFFF;">FUTURPROOF LABS</div>
+    </div>
+    <div class="fp-header-text">
+      <div class="fp-header-title">FuturProof Labs — Technical and Growth Partner</div>
+      <div class="fp-header-sub">Attribution, retargeting, data infrastructure, and platform development. Highly targeted audience-first strategy built from existing data before a single ad dollar is spent.</div>
+    </div>
+  </div>
+
+  <div class="fp-services" style="margin-bottom:2rem;">
+    <div class="fp-service">
+      <h4>Attribution and Data</h4>
+      <p>Track every lead source to funded deal. Know exactly which keywords, videos, and referral partners produce funded loans, not just clicks.</p>
+    </div>
+    <div class="fp-service">
+      <h4>Audience Build and Retargeting</h4>
+      <p>Upload existing client and prospect lists to seed lookalike audiences before paid ads launch. Target the right people before testing anything blind.</p>
+    </div>
+    <div class="fp-service">
+      <h4>YouTube and Paid Search</h4>
+      <p>Educational content targeting business owners by vertical. Industry-specific terms with lower CPC before touching broad competitive keywords.</p>
+    </div>
+    <div class="fp-service">
+      <h4>SEO Content Engine</h4>
+      <p>One deep page per industry vertical, one page per keyword cluster. Domain authority that compounds and eliminates paid acquisition cost over time.</p>
+    </div>
+    <div class="fp-service">
+      <h4>Platform Development</h4>
+      <p>Application flow, Plaid integration, CRM, data marketplace, and investor portal. Built on Next.js, Supabase, Stripe, and Vercel.</p>
+    </div>
+    <div class="fp-service">
+      <h4>Analytics and Reporting</h4>
+      <p>Real-time dashboards across all five revenue streams. Lead source attribution, rep performance, loan health, and investor returns in one view.</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:1.25rem 1.5rem;background:var(--bg);border-bottom:1px solid var(--border);">
+      <div style="font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Execution Timeline</div>
+    </div>
+    <div style="padding:0 1.5rem;">
+      <div class="gtm-row">
+        <div>
+          <div class="gtm-phase">Week 1 to 4</div>
+          <div class="gtm-phase-sub">Cold Outreach</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Start with what already works.</strong> Cold email and cold call using existing business data. Target UCC filers in the top three verticals: construction, trucking, restaurants. You have the list, the scripts, and the closers. This funds the platform build while development runs in parallel.
+        </div>
+      </div>
+      <div class="gtm-row">
+        <div>
+          <div class="gtm-phase">Month 1 to 2</div>
+          <div class="gtm-phase-sub">Declined Data Buyback</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Reach out to 3 to 5 direct lenders for their declined pipeline.</strong> OnDeck, Kabbage (AmEx), Bluevine all have leads they cannot place. Buy their monthly batch at low cost. You know the product and can work it from day one. Instant volume with high data quality.
+        </div>
+      </div>
+      <div class="gtm-row">
+        <div>
+          <div class="gtm-phase">Month 2 to 3</div>
+          <div class="gtm-phase-sub">Referral Network</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Sign five accountants or bookkeepers on referral commission.</strong> Offer 1 to 2% of the funded amount. One good CPA firm sends 3 to 4 Gold leads a month. At $250K average that is $7,500 to $10,000 commission per referral partner per month. Pays for itself on the first deal closed.
+        </div>
+      </div>
+      <div class="gtm-row">
+        <div>
+          <div class="gtm-phase">Month 3 to 4</div>
+          <div class="gtm-phase-sub">YouTube Ads</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Educational content targeting business owners by industry.</strong> Videos like "How to get $250K without showing tax returns" run in front of construction, restaurant, and trucking content. CPM is low. Hook on the problem, land on the application form. Attribution tracked from view to funded deal via UTM and Plaid connect completion events.
+        </div>
+      </div>
+      <div class="gtm-row">
+        <div>
+          <div class="gtm-phase">Month 4 to 6</div>
+          <div class="gtm-phase-sub">Google Paid Search</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Start narrow on highest-intent, lowest-CPC keywords.</strong> Industry-specific terms like "construction company working capital" before touching broad "business loan" terms. Confirm which keywords produce funded deals before scaling spend. Attribution first, budget second.
+        </div>
+      </div>
+      <div class="gtm-row" style="border-bottom:none;">
+        <div>
+          <div class="gtm-phase">Month 6 Plus</div>
+          <div class="gtm-phase-sub">SEO Content Engine</div>
+        </div>
+        <div class="gtm-detail">
+          <strong>Build topical authority in the SMB lending space.</strong> One deep page per industry vertical, one page per keyword cluster. Six to twelve months to rank but compounding free traffic that grows forever. This is how you reduce paid acquisition cost to near zero over time.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETITORS -->
+<section id="competitors">
+  <div class="sec-label">Competitive Landscape</div>
+  <h2>Where Skyline Wins</h2>
+  <p class="sec-sub">Nobody in this space operates all five revenue streams from a single lead. That structural advantage is the whole game.</p>
+
+  <div style="overflow-x:auto;">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Lead Origination</th>
+          <th>Data Resale</th>
+          <th>Brokerage</th>
+          <th>Direct Lending</th>
+          <th>Investor Capital</th>
+          <th>Streams</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="comp-name">LendingTree</div>
+            <div class="comp-sub">$400M/yr revenue</div>
+          </td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td style="color:var(--muted);font-weight:600;">2</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="comp-name">BusinessLoans.com</div>
+            <div class="comp-sub">Mid-tier marketplace</div>
+          </td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td style="color:var(--muted);font-weight:600;">2</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="comp-name">OnDeck / Bluevine</div>
+            <div class="comp-sub">Direct lenders</div>
+          </td>
+          <td><span class="partial">Partial</span></td>
+          <td><span class="partial">Partial</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="cross">No</span></td>
+          <td style="color:var(--muted);font-weight:600;">2</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="comp-name">ISO Shops</div>
+            <div class="comp-sub">Typical broker</div>
+          </td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td style="color:var(--muted);font-weight:600;">1</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="comp-name">Kabbage (AmEx)</div>
+            <div class="comp-sub">Acquired for $850M</div>
+          </td>
+          <td><span class="partial">Partial</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="cross">No</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="cross">No</span></td>
+          <td style="color:var(--muted);font-weight:600;">1 to 2</td>
+        </tr>
+        <tr class="skyline">
+          <td>
+            <div class="comp-name" style="color:var(--gold);">Skyline Capital</div>
+            <div class="comp-sub" style="color:var(--gold);opacity:0.7;">Target model</div>
+          </td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td><span class="check">Yes</span></td>
+          <td style="color:var(--gold);font-weight:800;font-size:1rem;">5</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- BUILD PHASES -->
+<section id="phases">
+  <div class="sec-label">Execution Roadmap</div>
+  <h2>Build Phases</h2>
+  <p class="sec-sub">Each phase ships revenue before the next one starts. No phase depends on the next to make money. Built by FuturProof Labs in parallel with active deal flow.</p>
+
+  <div class="card" style="padding:1.5rem;">
+    <div class="phase-row">
+      <div>
+        <div class="phase-tag">Phase 1<br>Month 1 to 2</div>
+      </div>
+      <div class="phase-content">
+        <h4>Lead Machine and CRM</h4>
+        <ul>
+          <li>Public application form live on skylinecaps.com</li>
+          <li>Plaid bank connection in the application flow</li>
+          <li>Qualification engine — 12-month gate, $50K per month minimum</li>
+          <li>Lead tier assignment: Gold, Silver, Bronze</li>
+          <li>CRM: rep assignment, pipeline stages, activity logging</li>
+          <li>Broker partner routing with webhook delivery</li>
+          <li>Email notifications to borrower at each stage transition</li>
+          <li>Cold outreach running in parallel using existing data</li>
+        </ul>
+      </div>
+      <div class="phase-rev">
+        <div class="phase-rev-label">Revenue Target</div>
+        <div class="phase-rev-value">$50K to $150K/mo</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div>
+        <div class="phase-tag">Phase 2<br>Month 2 to 4</div>
+      </div>
+      <div class="phase-content">
+        <h4>Data Marketplace</h4>
+        <ul>
+          <li>Marketplace listing engine — auto-list aged and stale leads</li>
+          <li>Buyer registration, API keys, and filter preferences</li>
+          <li>Stripe billing for marketplace purchases</li>
+          <li>Lead data snapshot delivery via webhook, CSV, and dashboard</li>
+          <li>External buyer API with programmatic browse and purchase</li>
+          <li>Admin listing management and pricing controls</li>
+          <li>YouTube and Google Ads campaigns launched</li>
+        </ul>
+      </div>
+      <div class="phase-rev">
+        <div class="phase-rev-label">Revenue Target</div>
+        <div class="phase-rev-value">$150K to $400K/mo</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div>
+        <div class="phase-tag">Phase 3<br>Month 4 to 6</div>
+      </div>
+      <div class="phase-content">
+        <h4>Investor Portal and Direct Lending</h4>
+        <ul>
+          <li>Investor onboarding with accreditation workflow</li>
+          <li>Subscription agreement for Reg D compliance</li>
+          <li>Stripe ACH deposits with $50K minimum</li>
+          <li>Manual capital deployment to Gold loans</li>
+          <li>Real-time return attribution as repayments collect</li>
+          <li>Monthly PDF statements auto-generated per investor</li>
+          <li>First direct loans funded from investor capital</li>
+        </ul>
+      </div>
+      <div class="phase-rev">
+        <div class="phase-rev-label">Revenue Target</div>
+        <div class="phase-rev-value">$400K to $1M/mo</div>
+      </div>
+    </div>
+    <div class="phase-row" style="border-bottom:none;">
+      <div>
+        <div class="phase-tag">Phase 4<br>Month 6 to 12</div>
+      </div>
+      <div class="phase-content">
+        <h4>Scale and Automation</h4>
+        <ul>
+          <li>Automated capital allocation engine — pro-rata by available balance</li>
+          <li>Lender API integrations for programmatic deal submission</li>
+          <li>Routing rules UI — business rule changes without code deploys</li>
+          <li>Advanced CRM analytics: cohort performance, rep leaderboard</li>
+          <li>Third-party investor accreditation verification</li>
+          <li>SEO content engine live with industry vertical pages</li>
+          <li>Referral partner dashboard and commission tracking portal</li>
+        </ul>
+      </div>
+      <div class="phase-rev">
+        <div class="phase-rev-label">Revenue Target</div>
+        <div class="phase-rev-value">$1M to $5M/mo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">
+    <div class="footer-brand">Skyline Capital Group</div>
+    skylinecaps.com — Confidential. Strategy document. Not for distribution.
+  </div>
+  <div class="footer-right">
+    <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo-black.png" alt="FuturProof Labs" onerror="this.style.display='none'">
+  </div>
+</footer>
+
+</body>
+</html>

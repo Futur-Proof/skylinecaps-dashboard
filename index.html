@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyline Capital — Operations Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#A8832A;--gold-light:#C9A84C;--gold-bg:#FBF6EC;--gold-border:#D4B870;
+  --charcoal:#1A1A1A;--bg:#F8F7F4;--text:#1A1A1A;--text2:#3D3D3D;--muted:#7A7570;
+  --border:#E2E0D8;--border2:#D4D0C8;--surface:#FFFFFF;
+  --green:#2A7A4B;--green-bg:#EDF7F2;--green-border:#B0D9C2;
+  --red:#B83232;--red-bg:#FEF2F2;
+  --blue:#1E5FAA;--blue-bg:#EDF3FA;
+  --purple:#6B3FA0;--purple-bg:#F4EFFA;
+  --orange:#B85A1A;--orange-bg:#FEF4EC;
+  --silver:#5A6070;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* HEADER */
+.header{background:var(--charcoal);color:white;padding:0.85rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.header-left{display:flex;align-items:center;gap:1rem}
+.header-logo{height:30px;display:block}
+.header-divider{width:1px;height:24px;background:rgba(255,255,255,0.15)}
+.header-title{font-size:0.78rem;font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:0.05em}
+.header-right{display:flex;align-items:center;gap:0.75rem}
+.header-badge{font-size:0.65rem;padding:0.25rem 0.6rem;border-radius:3px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.badge-live{background:rgba(42,122,75,0.3);color:#86EFAC;border:1px solid rgba(42,122,75,0.4)}
+.updated{font-size:0.7rem;color:rgba(255,255,255,0.3)}
+.header-select{padding:0.35rem 1.8rem 0.35rem 0.7rem;border:1px solid rgba(255,255,255,0.2);border-radius:5px;font-family:'Inter',sans-serif;font-size:0.72rem;color:white;background:#2A2A2A;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.5rem center}
+
+/* LEGEND BAR */
+.legend-bar{background:#111;padding:0.35rem 2rem;font-size:0.62rem;color:rgba(255,255,255,0.35);display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+.legend-bar span{display:flex;align-items:center;gap:0.35rem}
+.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--surface);padding:0 2rem;overflow-x:auto}
+.tab{padding:0.8rem 1.4rem;font-size:0.73rem;font-weight:500;text-transform:uppercase;letter-spacing:0.09em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--muted);transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* CONTAINER */
+.container{max-width:1400px;margin:0 auto;padding:1.75rem 2rem}
+.section{display:none}.section.active{display:block}
+
+/* METRIC CARDS */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.9rem;margin-bottom:1.5rem}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.25rem}
+.metric-card .mlabel{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.35rem;font-weight:500}
+.metric-card .mvalue{font-size:1.55rem;font-weight:700;color:var(--charcoal);line-height:1;margin-bottom:0.3rem}
+.metric-card .mdelta{font-size:0.7rem;font-weight:500}
+.delta-up{color:var(--green)}.delta-down{color:var(--red)}.delta-flat{color:var(--muted)}
+.metric-card.highlight{border-top:3px solid var(--gold-light);background:var(--gold-bg)}
+.metric-card.highlight .mvalue{color:var(--gold)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.9rem;font-weight:600}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.chart-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem}
+.chart-wrap{position:relative;height:200px}
+.chart-wrap-sm{position:relative;height:160px}
+.chart-wrap-lg{position:relative;height:260px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin-top:0.25rem}
+th{text-align:left;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:0.55rem 0.7rem;border-bottom:2px solid var(--border);font-weight:600;white-space:nowrap}
+td{padding:0.55rem 0.7rem;border-bottom:1px solid var(--border);font-size:0.79rem;color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+td strong{color:var(--text);font-weight:600}
+
+/* BADGES */
+.badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:3px;font-size:0.62rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+.badge-gold{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+.badge-silver{background:#F0F0F4;color:var(--silver);border:1px solid #D0D0D8}
+.badge-bronze{background:#FEF4EC;color:var(--orange);border:1px solid #E8C4A0}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid #A8C4E8}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid #F0BABA}
+.badge-purple{background:var(--purple-bg);color:var(--purple);border:1px solid #C8AEED}
+.badge-orange{background:var(--orange-bg);color:var(--orange);border:1px solid #E8C4A0}
+.badge-gray{background:#F3F4F6;color:#374151;border:1px solid #E5E7EB}
+
+/* PIPELINE VISUAL */
+.pipeline-vis{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:0.75rem}
+.pv-stage{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:0.7rem 0.5rem;text-align:center}
+.pv-stage .pv-num{font-size:1.3rem;font-weight:800;color:var(--charcoal);line-height:1;margin-bottom:0.2rem}
+.pv-stage .pv-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500}
+.pv-stage .pv-bar{height:3px;border-radius:2px;margin-top:0.5rem}
+
+/* WATERFALL FUNNEL */
+.funnel-vis{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0.5rem 0}
+.fv-step{display:flex;align-items:center;justify-content:space-between;color:white;font-weight:600;border-radius:4px;padding:0.55rem 1.25rem;width:100%}
+.fv-label{font-size:0.7rem;font-weight:500;opacity:0.9}
+.fv-num{font-size:0.85rem;font-weight:800}
+.fv-rate{font-size:0.62rem;opacity:0.65}
+.fv-drop{font-size:0.62rem;color:var(--muted);text-align:center;padding:0.15rem 0}
+
+/* INSIGHT TOGGLES */
+.insight-toggle{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0 0.15rem;cursor:pointer;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);user-select:none;border:none;background:none}
+.insight-toggle svg{width:10px;height:10px;transition:transform 0.2s;fill:currentColor}
+.insight-toggle.open svg{transform:rotate(90deg)}
+.insight-body{display:none;padding:0.4rem 0;font-size:0.77rem;line-height:1.6;color:var(--muted)}
+.insight-body.open{display:block}
+.insight-body ul{list-style:none;padding:0}
+.insight-body li{padding:0.28rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:flex-start}
+.insight-body li:last-child{border-bottom:none}
+.idot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dot-red{background:var(--red)}.dot-green{background:var(--green)}.dot-gold{background:var(--gold-light)}.dot-blue{background:var(--blue)}
+
+/* SCORECARD ROW */
+.scorecard-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;margin-bottom:1rem}
+.scorecard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;gap:0.9rem}
+.scorecard-icon{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;flex-shrink:0}
+.sc-gold{background:var(--gold-bg);color:var(--gold)}
+.sc-green{background:var(--green-bg);color:var(--green)}
+.sc-blue{background:var(--blue-bg);color:var(--blue)}
+.sc-red{background:var(--red-bg);color:var(--red)}
+.sc-purple{background:var(--purple-bg);color:var(--purple)}
+.sc-orange{background:var(--orange-bg);color:var(--orange)}
+.scorecard-body .sc-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;margin-bottom:0.15rem}
+.scorecard-body .sc-val{font-size:1.1rem;font-weight:800;color:var(--charcoal)}
+.scorecard-body .sc-sub{font-size:0.68rem;color:var(--muted);margin-top:0.1rem}
+
+/* INVESTOR TRACK */
+.inv-bar-wrap{margin-bottom:0.6rem}
+.inv-bar-label{display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem}
+.inv-bar-label span:first-child{color:var(--text2);font-weight:500}
+.inv-bar-label span:last-child{color:var(--gold);font-weight:700}
+.inv-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.inv-fill{height:100%;background:var(--gold-light);border-radius:3px}
+
+/* STRATEGY / ARCH EMBED */
+.strategy-frame{width:100%;height:82vh;border:1px solid var(--border);border-radius:8px}
+
+/* PASSWORD GATE */
+#pw-gate{position:fixed;inset:0;background:var(--charcoal);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
+#pw-gate.hidden{display:none}
+.pw-box{background:#242424;border:1px solid #3A3A3A;border-radius:10px;padding:2.5rem 2.75rem;text-align:center;width:340px;max-width:90vw}
+.pw-logo{height:28px;margin:0 auto 1.5rem;display:block}
+.pw-title{font-size:1rem;font-weight:700;color:white;margin-bottom:0.25rem}
+.pw-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:1.5rem}
+.pw-input{width:100%;background:#1A1A1A;border:1px solid #444;border-radius:6px;color:white;font-family:'Inter',sans-serif;font-size:0.9rem;padding:0.7rem 1rem;outline:none;letter-spacing:0.06em;text-align:center}
+.pw-input:focus{border-color:var(--gold-light)}
+.pw-btn{width:100%;margin-top:0.9rem;padding:0.7rem;background:var(--gold);color:white;border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer}
+.pw-btn:hover{background:var(--gold-light)}
+.pw-err{font-size:0.7rem;color:#F87171;margin-top:0.5rem;min-height:1rem}
+
+/* STATUS PILLS */
+.status-funded{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.status-active{background:var(--blue-bg);color:var(--blue);border:1px solid #A8C4E8;display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.status-submitted{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.status-contact{background:#F0F0F4;color:var(--silver);border:1px solid #D0D0D8;display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.status-default{background:var(--red-bg);color:var(--red);border:1px solid #F0BABA;display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.status-sold{background:var(--purple-bg);color:var(--purple);border:1px solid #C8AEED;display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+
+@media(max-width:900px){.metrics-row{grid-template-columns:repeat(2,1fr)}.chart-row,.chart-row-3{grid-template-columns:1fr}.scorecard-row{grid-template-columns:1fr}.pipeline-vis{grid-template-columns:repeat(4,1fr)}.container{padding:1rem}}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="pw-box">
+    <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png" class="pw-logo" alt="FuturProof Labs" onerror="this.style.display='none'">
+    <div class="pw-title">Skyline Capital</div>
+    <div class="pw-sub">Operations Dashboard — Restricted Access</div>
+    <input id="pw-input" class="pw-input" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Access Dashboard</button>
+    <div class="pw-err" id="pw-err"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png" class="header-logo" alt="FuturProof Labs" onerror="this.style.display='none'">
+    <div class="header-divider"></div>
+    <div>
+      <div style="font-size:0.85rem;font-weight:700;color:white;letter-spacing:0.02em">Skyline Capital</div>
+      <div class="header-title">Operations Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-live">Live</span>
+    <select class="header-select" id="dateRange" onchange="setDateRange(this.value)">
+      <option value="30">Last 30 Days</option>
+      <option value="14">Last 14 Days</option>
+      <option value="7">Last 7 Days</option>
+      <option value="90">Last 90 Days</option>
+    </select>
+    <span class="updated" id="lastUpdated"></span>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend-bar">
+  <span style="letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.2)">Status Key</span>
+  <span><span class="legend-dot" style="background:#B83232"></span> Needs Action</span>
+  <span><span class="legend-dot" style="background:#B85A1A"></span> Review Recommended</span>
+  <span><span class="legend-dot" style="background:#2A7A4B"></span> On Track</span>
+  <span><span class="legend-dot" style="background:#A8832A"></span> High Priority</span>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview',this)">Overview</div>
+  <div class="tab" onclick="showTab('pipeline',this)">Lead Pipeline</div>
+  <div class="tab" onclick="showTab('deals',this)">Deals / CRM</div>
+  <div class="tab" onclick="showTab('lending',this)">Lending</div>
+  <div class="tab" onclick="showTab('marketplace',this)">Marketplace</div>
+  <div class="tab" onclick="showTab('investors',this)">Investors</div>
+  <div class="tab" onclick="showTab('strategy',this)">Strategy</div>
+  <div class="tab" onclick="showTab('architecture',this)">Architecture</div>
+</div>
+
+<div class="container">
+
+<!-- ============ OVERVIEW ============ -->
+<div class="section active" id="overview">
+  <div class="metrics-row">
+    <div class="metric-card highlight">
+      <div class="mlabel">Gross Revenue (MTD)</div>
+      <div class="mvalue" id="m-revenue">$0</div>
+      <div class="mdelta delta-up" id="m-revenue-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Leads This Month</div>
+      <div class="mvalue" id="m-leads">0</div>
+      <div class="mdelta delta-up" id="m-leads-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Funded Deals (MTD)</div>
+      <div class="mvalue" id="m-funded">0</div>
+      <div class="mdelta" id="m-funded-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Active Loans</div>
+      <div class="mvalue" id="m-active">0</div>
+      <div class="mdelta" id="m-active-d"></div>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="mlabel">Broker Commissions (MTD)</div>
+      <div class="mvalue" id="m-commission">$0</div>
+      <div class="mdelta delta-up" id="m-commission-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Marketplace Revenue (MTD)</div>
+      <div class="mvalue" id="m-mkt">$0</div>
+      <div class="mdelta" id="m-mkt-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Capital Deployed</div>
+      <div class="mvalue" id="m-deployed">$0</div>
+      <div class="mdelta" id="m-deployed-d"></div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Default Rate</div>
+      <div class="mvalue" id="m-default">0%</div>
+      <div class="mdelta" id="m-default-d"></div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Daily Revenue — All Streams</div>
+      <div class="chart-wrap"><canvas id="dailyRevenueChart"></canvas></div>
+      <button class="insight-toggle" onclick="toggleInsight('insight-revenue',this)">
+        <svg viewBox="0 0 10 10"><path d="M3 2l4 3-4 3"/></svg> Insights
+      </button>
+      <div class="insight-body" id="insight-revenue">
+        <ul>
+          <li><span class="idot dot-green"></span>Commission revenue trending up 18% week over week from construction and trucking deals closing.</li>
+          <li><span class="idot dot-gold"></span>Direct lending revenue peaks mid-month as repayments align with weekly payment schedules.</li>
+          <li><span class="idot dot-blue"></span>Marketplace revenue is steady but has room to grow. 340 leads aged past 7 days without a listing.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lead Volume by Tier — Daily</div>
+      <div class="chart-wrap"><canvas id="dailyLeadsChart"></canvas></div>
+      <button class="insight-toggle" onclick="toggleInsight('insight-leads',this)">
+        <svg viewBox="0 0 10 10"><path d="M3 2l4 3-4 3"/></svg> Insights
+      </button>
+      <div class="insight-body" id="insight-leads">
+        <ul>
+          <li><span class="idot dot-gold"></span>Gold lead volume spiked Tuesday and Wednesday. Source traced to YouTube campaign targeting construction contractors in NY and FL.</li>
+          <li><span class="idot dot-red"></span>Bronze lead qualification rate dropped to 38%. Review ad targeting — lower-revenue businesses entering the funnel from broad-match keywords.</li>
+          <li><span class="idot dot-green"></span>Silver leads converting to docs submitted at 54%, above the 50% industry benchmark.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pipeline Stage Summary — All Active Deals</div>
+    <div class="pipeline-vis" id="pipelineVis"></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:0.25rem">
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">New Lead</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Contacted</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Docs Req.</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Docs In</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Submitted</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Approved</div>
+      <div style="font-size:0.58rem;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em">Funded</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Revenue by Stream (MTD)</div>
+      <div class="chart-wrap"><canvas id="revenueStreamChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lead Sources</div>
+      <div class="chart-wrap"><canvas id="leadSourceChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recent Activity</div>
+    <table>
+      <thead><tr><th>Time</th><th>Event</th><th>Business</th><th>Tier</th><th>Amount</th><th>Rep</th><th>Status</th></tr></thead>
+      <tbody id="activityTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ LEAD PIPELINE ============ -->
+<div class="section" id="pipeline">
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="mlabel">Total Leads (MTD)</div>
+      <div class="mvalue" id="p-total">0</div>
+      <div class="mdelta delta-up">+22% vs last month</div>
+    </div>
+    <div class="metric-card highlight">
+      <div class="mlabel">Gold Leads</div>
+      <div class="mvalue" id="p-gold">0</div>
+      <div class="mdelta delta-up">$250K+ requested</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Silver Leads</div>
+      <div class="mvalue" id="p-silver">0</div>
+      <div class="mdelta delta-up">$50K-$250K</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Bronze Leads</div>
+      <div class="mvalue" id="p-bronze">0</div>
+      <div class="mdelta delta-flat">Under $50K — marketplace</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Lead Conversion Funnel</div>
+      <div class="funnel-vis" id="conversionFunnel"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lead Tier Distribution Over Time</div>
+      <div class="chart-wrap-lg"><canvas id="tierTrendChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Lead Source Performance</div>
+      <table>
+        <thead><tr><th>Source</th><th>Leads</th><th>Gold</th><th>Silver</th><th>Qualified %</th><th>Avg Req. Amount</th><th>Cost/Lead</th></tr></thead>
+        <tbody id="leadSourceTable"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">Lead Quality Breakdown</div>
+      <div class="chart-wrap"><canvas id="qualityChart"></canvas></div>
+      <button class="insight-toggle" onclick="toggleInsight('insight-quality',this)">
+        <svg viewBox="0 0 10 10"><path d="M3 2l4 3-4 3"/></svg> Insights
+      </button>
+      <div class="insight-body" id="insight-quality">
+        <ul>
+          <li><span class="idot dot-gold"></span>Gold leads from referral partners close at 31% — 3x the rate of paid search at 9%. Prioritize referral network expansion.</li>
+          <li><span class="idot dot-blue"></span>YouTube leads take 4.2 days longer to close but have a 22% higher average funded amount vs Google Search leads.</li>
+          <li><span class="idot dot-red"></span>UCC list leads have a 48% disqualification rate — review list vintage and filter to businesses under 24 months from filing date.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Industry Breakdown</div>
+    <table>
+      <thead><tr><th>Industry</th><th>Leads</th><th>Avg Requested</th><th>Qualify Rate</th><th>Close Rate</th><th>Avg Funded</th><th>Top Source</th></tr></thead>
+      <tbody id="industryTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ DEALS / CRM ============ -->
+<div class="section" id="deals">
+  <div class="metrics-row">
+    <div class="metric-card highlight">
+      <div class="mlabel">Total Commission (MTD)</div>
+      <div class="mvalue" id="d-commission">$0</div>
+      <div class="mdelta delta-up">+18% vs last month</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Deals in Pipeline</div>
+      <div class="mvalue" id="d-pipeline">0</div>
+      <div class="mdelta delta-flat">Open deals across all stages</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Funded This Month</div>
+      <div class="mvalue" id="d-funded">0</div>
+      <div class="mdelta delta-up">deals closed</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Avg Deal Size</div>
+      <div class="mvalue" id="d-avgsize">$0</div>
+      <div class="mdelta delta-up">+$28K vs last month</div>
+    </div>
+  </div>
+
+  <div class="scorecard-row">
+    <div class="scorecard">
+      <div class="scorecard-icon sc-gold">$</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Total Volume Funded (MTD)</div>
+        <div class="sc-val" id="sc-volume">$0</div>
+        <div class="sc-sub">Across all lender placements</div>
+      </div>
+    </div>
+    <div class="scorecard">
+      <div class="scorecard-icon sc-green">%</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Avg Commission Rate</div>
+        <div class="sc-val">9.4%</div>
+        <div class="sc-sub">Across broker placements</div>
+      </div>
+    </div>
+    <div class="scorecard">
+      <div class="scorecard-icon sc-blue">D</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Avg Days to Fund</div>
+        <div class="sc-val">6.2 days</div>
+        <div class="sc-sub">From docs received to funded</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Commission by Rep (MTD)</div>
+      <div class="chart-wrap"><canvas id="repCommissionChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Deal Stage Distribution</div>
+      <div class="chart-wrap"><canvas id="dealStageChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Active Deals — Full Pipeline</div>
+    <table>
+      <thead><tr><th>Business</th><th>Industry</th><th>Tier</th><th>Requested</th><th>Stage</th><th>Rep</th><th>Days in Stage</th><th>Lender</th><th>Last Activity</th></tr></thead>
+      <tbody id="dealsTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Lender Partner Performance</div>
+    <table>
+      <thead><tr><th>Lender</th><th>Submissions</th><th>Approved</th><th>Funded</th><th>Approval Rate</th><th>Avg Funded Amt</th><th>Avg Days</th><th>Status</th></tr></thead>
+      <tbody id="lenderTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ LENDING ============ -->
+<div class="section" id="lending">
+  <div class="metrics-row">
+    <div class="metric-card highlight">
+      <div class="mlabel">Total Portfolio (Active)</div>
+      <div class="mvalue" id="l-portfolio">$0</div>
+      <div class="mdelta delta-up">Direct loan book</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Collected This Month</div>
+      <div class="mvalue" id="l-collected">$0</div>
+      <div class="mdelta delta-up">ACH repayments</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Failed Payments</div>
+      <div class="mvalue" id="l-failed">0</div>
+      <div class="mdelta delta-down">Require immediate action</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Default Rate</div>
+      <div class="mvalue" id="l-default">0%</div>
+      <div class="mdelta delta-flat">Industry avg 18-22%</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Daily Repayments — Collected vs Scheduled</div>
+      <div class="chart-wrap"><canvas id="repaymentChart"></canvas></div>
+      <button class="insight-toggle" onclick="toggleInsight('insight-repayment',this)">
+        <svg viewBox="0 0 10 10"><path d="M3 2l4 3-4 3"/></svg> Insights
+      </button>
+      <div class="insight-body" id="insight-repayment">
+        <ul>
+          <li><span class="idot dot-red"></span>3 ACH failures this week from restaurant loans. Common cause: NSF from slow weekend deposit timing. Retry scheduled for Tuesday.</li>
+          <li><span class="idot dot-green"></span>Construction loan cohort at 99.1% collection rate. Highest performing vertical in the book.</li>
+          <li><span class="idot dot-gold"></span>Loans funded in Q1 showing 94.3% repayment completion. On track for projected returns.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Portfolio by Industry</div>
+      <div class="chart-wrap"><canvas id="portfolioIndustryChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Active Loan Book</div>
+    <table>
+      <thead><tr><th>Business</th><th>Industry</th><th>Funded Amt</th><th>Total Payback</th><th>Collected</th><th>Remaining</th><th>Freq</th><th>Next Payment</th><th>Days Past Due</th><th>Status</th></tr></thead>
+      <tbody id="loanBookTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Failed Repayments — Action Required</div>
+    <table>
+      <thead><tr><th>Business</th><th>Scheduled Date</th><th>Amount Due</th><th>Failure Reason</th><th>Retry Count</th><th>Action</th></tr></thead>
+      <tbody id="failedPaymentsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ MARKETPLACE ============ -->
+<div class="section" id="marketplace">
+  <div class="metrics-row">
+    <div class="metric-card highlight">
+      <div class="mlabel">Marketplace Revenue (MTD)</div>
+      <div class="mvalue" id="mk-revenue">$0</div>
+      <div class="mdelta delta-up">+34% vs last month</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Active Listings</div>
+      <div class="mvalue" id="mk-listings">0</div>
+      <div class="mdelta delta-flat">Available to buyers</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Leads Sold (MTD)</div>
+      <div class="mvalue" id="mk-sold">0</div>
+      <div class="mdelta delta-up">Across all listing types</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Avg Sale Price</div>
+      <div class="mvalue" id="mk-avgprice">$0</div>
+      <div class="mdelta delta-up">Blended all types</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Marketplace Revenue Trend</div>
+      <div class="chart-wrap"><canvas id="marketplaceTrendChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Sales by Listing Type</div>
+      <div class="chart-wrap"><canvas id="listingTypeChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Active Buyers</div>
+    <table>
+      <thead><tr><th>Buyer</th><th>Filters</th><th>Purchases (MTD)</th><th>Spend (MTD)</th><th>Avg Price Paid</th><th>Preferred Type</th><th>Status</th></tr></thead>
+      <tbody id="buyersTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Listings Eligible for Marketplace — Not Yet Listed</div>
+    <table>
+      <thead><tr><th>Lead ID</th><th>Business</th><th>Industry</th><th>Tier</th><th>Age (Days)</th><th>Data Quality</th><th>Est. Price</th><th>Action</th></tr></thead>
+      <tbody id="unlistedTable"></tbody>
+    </table>
+    <div style="padding:0.75rem 0 0;font-size:0.75rem;color:var(--red);font-weight:500;">340 eligible leads not yet listed. Estimated revenue opportunity: $2,100 to $15,300.</div>
+  </div>
+</div>
+
+<!-- ============ INVESTORS ============ -->
+<div class="section" id="investors">
+  <div class="metrics-row">
+    <div class="metric-card highlight">
+      <div class="mlabel">Total Capital Committed</div>
+      <div class="mvalue" id="i-committed">$0</div>
+      <div class="mdelta delta-up">From 8 active investors</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Capital Deployed</div>
+      <div class="mvalue" id="i-deployed">$0</div>
+      <div class="mdelta delta-up">Across 12 active loans</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Available to Deploy</div>
+      <div class="mvalue" id="i-available">$0</div>
+      <div class="mdelta delta-flat">Awaiting allocation</div>
+    </div>
+    <div class="metric-card">
+      <div class="mlabel">Returns Credited (MTD)</div>
+      <div class="mvalue" id="i-returns">$0</div>
+      <div class="mdelta delta-up">Net of platform fee</div>
+    </div>
+  </div>
+
+  <div class="scorecard-row">
+    <div class="scorecard">
+      <div class="scorecard-icon sc-gold">%</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Avg Realized Return (Annualized)</div>
+        <div class="sc-val">23.4%</div>
+        <div class="sc-sub">Across all deployed capital</div>
+      </div>
+    </div>
+    <div class="scorecard">
+      <div class="scorecard-icon sc-green">$</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Platform Fee Collected (MTD)</div>
+        <div class="sc-val" id="sc-fee">$0</div>
+        <div class="sc-sub">2% of investor returns</div>
+      </div>
+    </div>
+    <div class="scorecard">
+      <div class="scorecard-icon sc-blue">#</div>
+      <div class="scorecard-body">
+        <div class="sc-label">Pending Accreditation</div>
+        <div class="sc-val">3</div>
+        <div class="sc-sub">Review queue — action needed</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-title">Capital Allocation</div>
+      <div class="chart-wrap"><canvas id="capitalAllocationChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monthly Returns Credited to Investors</div>
+      <div class="chart-wrap"><canvas id="returnsChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Investor Accounts</div>
+    <div style="margin-bottom:1rem" id="investorBars"></div>
+    <table>
+      <thead><tr><th>Investor</th><th>Committed</th><th>Deployed</th><th>Available</th><th>Total Earned</th><th>Annualized Return</th><th>Status</th><th>Last Deposit</th></tr></thead>
+      <tbody id="investorsTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Capital Deployments — Loan Level</div>
+    <table>
+      <thead><tr><th>Loan</th><th>Business</th><th>Investor</th><th>Deployed</th><th>Ownership %</th><th>Exp. Return</th><th>Earned to Date</th><th>Status</th></tr></thead>
+      <tbody id="deploymentTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ STRATEGY ============ -->
+<div class="section" id="strategy">
+  <div class="card" style="padding:1rem;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+      <div>
+        <div class="card-title" style="margin-bottom:0.2rem;">Strategy and Pipeline Document</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Full go-to-market strategy, keyword targets, lead sources, revenue model, and build phases.</div>
+      </div>
+      <a href="skylinecaps-strategy.html" target="_blank" style="font-size:0.72rem;color:var(--gold);font-weight:600;text-decoration:none;border:1px solid var(--gold-border);padding:0.35rem 0.75rem;border-radius:4px;background:var(--gold-bg);">Open Full Screen</a>
+    </div>
+  </div>
+  <iframe src="skylinecaps-strategy.html" class="strategy-frame" title="Skyline Capital Strategy"></iframe>
+</div>
+
+<!-- ============ ARCHITECTURE ============ -->
+<div class="section" id="architecture">
+  <div class="card" style="padding:1rem;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+      <div>
+        <div class="card-title" style="margin-bottom:0.2rem;">Platform Architecture</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Full DB schema, route map, API layer, integrations, lead routing waterfall, and build phases.</div>
+      </div>
+      <a href="skylinecaps-architecture.html" target="_blank" style="font-size:0.72rem;color:var(--gold);font-weight:600;text-decoration:none;border:1px solid var(--gold-border);padding:0.35rem 0.75rem;border-radius:4px;background:var(--gold-bg);">Open Full Screen</a>
+    </div>
+  </div>
+  <iframe src="skylinecaps-architecture.html" class="strategy-frame" title="Skyline Capital Architecture"></iframe>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ============ PASSWORD GATE ============
+(function(){
+  const gate=document.getElementById('pw-gate');
+  if(sessionStorage.getItem('skyline_auth')==='1'){gate.classList.add('hidden');return;}
+  gate.querySelector('#pw-input').focus();
+})();
+function checkPw(){
+  const val=document.getElementById('pw-input').value;
+  const err=document.getElementById('pw-err');
+  if(val==='lending'){
+    sessionStorage.setItem('skyline_auth','1');
+    document.getElementById('pw-gate').classList.add('hidden');
+    err.textContent='';
+  } else {
+    err.textContent='Incorrect password.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ============ UTILITIES ============
+function fmt(n){return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+n.toLocaleString()}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'K':n.toString()}
+function pct(n){return n.toFixed(1)+'%'}
+
+document.getElementById('lastUpdated').textContent='Updated '+new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+function showTab(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+function toggleInsight(id,btn){
+  const body=document.getElementById(id);
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function setDateRange(v){ /* in production: re-fetch data for range */ }
+
+// ============ SAMPLE DATA ============
+const DATA = {
+  revenue:{total:284500,commission:148000,direct:112000,marketplace:18200,platform:6300},
+  leads:{total:487,gold:82,silver:163,bronze:242},
+  funded:{count:21,avgSize:168000,volume:3528000},
+  activeLoanCount:12,
+  defaultRate:4.2,
+  capitalCommitted:1850000,
+  capitalDeployed:1420000,
+  capitalAvailable:430000,
+  returnsThisMonth:27400,
+  platformFee:548,
+  marketplaceListings:218,
+  marketplaceSold:142,
+  marketplaceAvgPrice:128,
+};
+
+// ============ POPULATE METRICS ============
+document.getElementById('m-revenue').textContent=fmt(DATA.revenue.total);
+document.getElementById('m-revenue-d').textContent='+$52K vs last month';
+document.getElementById('m-leads').textContent=DATA.leads.total;
+document.getElementById('m-leads-d').textContent='+22% vs last month';
+document.getElementById('m-funded').textContent=DATA.funded.count+' deals';
+document.getElementById('m-funded-d').textContent='$'+DATA.funded.volume.toLocaleString()+' total volume';
+document.getElementById('m-active').textContent=DATA.activeLoanCount;
+document.getElementById('m-active-d').textContent='$1.42M deployed';
+document.getElementById('m-commission').textContent=fmt(DATA.revenue.commission);
+document.getElementById('m-commission-d').textContent='+18% vs last month';
+document.getElementById('m-mkt').textContent=fmt(DATA.revenue.marketplace);
+document.getElementById('m-mkt-d').textContent='+34% vs last month';
+document.getElementById('m-deployed').textContent=fmt(DATA.capitalDeployed);
+document.getElementById('m-deployed-d').textContent='77% utilization rate';
+document.getElementById('m-default').textContent=pct(DATA.defaultRate);
+document.getElementById('m-default-d').className='mdelta delta-green';
+document.getElementById('m-default-d').textContent='Below 18% industry avg';
+
+// Pipeline
+document.getElementById('p-total').textContent=DATA.leads.total;
+document.getElementById('p-gold').textContent=DATA.leads.gold;
+document.getElementById('p-silver').textContent=DATA.leads.silver;
+document.getElementById('p-bronze').textContent=DATA.leads.bronze;
+
+// Deals
+document.getElementById('d-commission').textContent=fmt(DATA.revenue.commission);
+document.getElementById('d-pipeline').textContent='94';
+document.getElementById('d-funded').textContent=DATA.funded.count;
+document.getElementById('d-avgsize').textContent=fmt(DATA.funded.avgSize);
+document.getElementById('sc-volume').textContent=fmt(DATA.funded.volume);
+
+// Lending
+document.getElementById('l-portfolio').textContent=fmt(DATA.capitalDeployed);
+document.getElementById('l-collected').textContent='$86,400';
+document.getElementById('l-failed').textContent='3';
+document.getElementById('l-default').textContent=pct(DATA.defaultRate);
+
+// Marketplace
+document.getElementById('mk-revenue').textContent=fmt(DATA.revenue.marketplace);
+document.getElementById('mk-listings').textContent=DATA.marketplaceListings;
+document.getElementById('mk-sold').textContent=DATA.marketplaceSold;
+document.getElementById('mk-avgprice').textContent=fmt(DATA.marketplaceAvgPrice);
+
+// Investors
+document.getElementById('i-committed').textContent=fmt(DATA.capitalCommitted);
+document.getElementById('i-deployed').textContent=fmt(DATA.capitalDeployed);
+document.getElementById('i-available').textContent=fmt(DATA.capitalAvailable);
+document.getElementById('i-returns').textContent=fmt(DATA.returnsThisMonth);
+document.getElementById('sc-fee').textContent=fmt(DATA.platformFee);
+
+// ============ PIPELINE VISUAL ============
+const stages=[
+  {count:87,color:'#D4D0C8'},
+  {count:63,color:'#A8C4E8'},
+  {count:48,color:'#FDBA74'},
+  {count:31,color:'#C8AEED'},
+  {count:22,color:'#D4B870'},
+  {count:14,color:'#C9A84C'},
+  {count:21,color:'#B0D9C2'},
+];
+const pvWrap=document.getElementById('pipelineVis');
+stages.forEach(s=>{
+  const el=document.createElement('div');
+  el.className='pv-stage';
+  el.innerHTML=`<div class="pv-num">${s.count}</div><div class="pv-bar" style="background:${s.color}"></div>`;
+  pvWrap.appendChild(el);
+});
+
+// ============ FUNNEL ============
+const funnelData=[
+  {label:'Leads Generated',n:487,color:'#3D3D3D',drop:'65% pass 12-month + $50K gate'},
+  {label:'Pass Qualification',n:316,color:'#1E5FAA',drop:'60% respond to outreach'},
+  {label:'Initial Contact',n:190,color:'#6B3FA0',drop:'50% submit docs'},
+  {label:'Docs Submitted',n:95,color:'#B85A1A',drop:'74% get approved'},
+  {label:'Approved',n:70,color:'#A8832A',drop:'85% accept offer'},
+  {label:'Funded',n:21,color:'#2A7A4B',drop:null},
+];
+const fv=document.getElementById('conversionFunnel');
+funnelData.forEach((f,i)=>{
+  const w=100-i*10;
+  const step=document.createElement('div');
+  step.className='fv-step';
+  step.style.cssText=`width:${w}%;background:${f.color};`;
+  step.innerHTML=`<span class="fv-label">${f.label}</span><span class="fv-num">${f.n}</span>`;
+  fv.appendChild(step);
+  if(f.drop){const d=document.createElement('div');d.className='fv-drop';d.textContent=f.drop;fv.appendChild(d);}
+});
+
+// ============ CHART DEFAULTS ============
+Chart.defaults.font.family="'Inter',sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color='#7A7570';
+Chart.defaults.plugins.legend.labels.boxWidth=10;
+Chart.defaults.plugins.legend.labels.padding=12;
+
+const goldC='rgba(168,131,42,0.85)';
+const goldLight='rgba(201,168,76,0.3)';
+const greenC='rgba(42,122,75,0.8)';
+const blueC='rgba(30,95,170,0.8)';
+const purpleC='rgba(107,63,160,0.8)';
+const orangeC='rgba(184,90,26,0.8)';
+const redC='rgba(184,50,50,0.8)';
+
+// Generate date labels
+function genDates(n){
+  const arr=[];
+  const now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now);
+    d.setDate(d.getDate()-i);
+    arr.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  }
+  return arr;
+}
+
+const days30=genDates(30);
+const rand=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+const randArr=(n,min,max)=>Array.from({length:n},()=>rand(min,max));
+
+// DAILY REVENUE CHART
+new Chart(document.getElementById('dailyRevenueChart'),{
+  type:'bar',
+  data:{
+    labels:days30,
+    datasets:[
+      {label:'Commission',data:randArr(30,2000,9000),backgroundColor:'rgba(168,131,42,0.75)',stack:'a'},
+      {label:'Direct Lending',data:randArr(30,1000,6000),backgroundColor:'rgba(42,122,75,0.7)',stack:'a'},
+      {label:'Marketplace',data:randArr(30,200,1200),backgroundColor:'rgba(30,95,170,0.6)',stack:'a'},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>'$'+v.toLocaleString()}}}}
+});
+
+// DAILY LEADS CHART
+new Chart(document.getElementById('dailyLeadsChart'),{
+  type:'bar',
+  data:{
+    labels:days30,
+    datasets:[
+      {label:'Gold',data:randArr(30,1,6),backgroundColor:'rgba(168,131,42,0.85)',stack:'b'},
+      {label:'Silver',data:randArr(30,3,10),backgroundColor:'rgba(90,96,112,0.6)',stack:'b'},
+      {label:'Bronze',data:randArr(30,4,14),backgroundColor:'rgba(184,90,26,0.5)',stack:'b'},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid:{color:'rgba(0,0,0,0.04)'}}}}
+});
+
+// REVENUE STREAMS DONUT
+new Chart(document.getElementById('revenueStreamChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Broker Commission','Direct Lending','Marketplace','Platform Fee'],
+    datasets:[{data:[148000,112000,18200,6300],backgroundColor:[goldC,greenC,blueC,purpleC],borderWidth:1,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right'}}}
+});
+
+// LEAD SOURCE PIE
+new Chart(document.getElementById('leadSourceChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Google Search','YouTube Ads','UCC Lists','Referral Partners','Declined Buyback','LinkedIn','Other'],
+    datasets:[{data:[142,88,74,51,63,32,37],backgroundColor:[goldC,greenC,blueC,purpleC,orangeC,redC,'rgba(90,96,112,0.7)'],borderWidth:1,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right'}}}
+});
+
+// TIER TREND CHART
+new Chart(document.getElementById('tierTrendChart'),{
+  type:'line',
+  data:{
+    labels:days30,
+    datasets:[
+      {label:'Gold',data:randArr(30,1,6),borderColor:'rgba(168,131,42,1)',backgroundColor:'rgba(168,131,42,0.08)',fill:true,tension:0.4,pointRadius:2},
+      {label:'Silver',data:randArr(30,3,12),borderColor:'rgba(90,96,112,0.9)',backgroundColor:'rgba(90,96,112,0.06)',fill:true,tension:0.4,pointRadius:2},
+      {label:'Bronze',data:randArr(30,5,16),borderColor:'rgba(184,90,26,0.8)',backgroundColor:'rgba(184,90,26,0.06)',fill:true,tension:0.4,pointRadius:2},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid:{color:'rgba(0,0,0,0.04)'}}}}
+});
+
+// QUALITY CHART
+new Chart(document.getElementById('qualityChart'),{
+  type:'bar',
+  data:{
+    labels:['Google Search','YouTube','UCC Lists','Referral','Buyback','LinkedIn'],
+    datasets:[
+      {label:'Close Rate %',data:[9.2,11.8,6.4,31.2,8.8,4.1],backgroundColor:[goldC,greenC,blueC,purpleC,orangeC,redC]}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}}}
+});
+
+// REP COMMISSION CHART
+new Chart(document.getElementById('repCommissionChart'),{
+  type:'bar',
+  data:{
+    labels:['Marcus R.','David K.','Yael S.','Avi T.','Sarah M.','Josh L.'],
+    datasets:[{label:'Commission ($)',data:[38200,29400,24800,21600,18900,15100],backgroundColor:goldC}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>'$'+(v/1000)+'K'}}}}
+});
+
+// DEAL STAGE DONUT
+new Chart(document.getElementById('dealStageChart'),{
+  type:'doughnut',
+  data:{
+    labels:['New Lead','Contacted','Docs Requested','Docs In','Submitted','Approved','Funded'],
+    datasets:[{data:[87,63,48,31,22,14,21],backgroundColor:['#D4D0C8','#A8C4E8','#FDBA74','#C8AEED','#D4B870','#C9A84C','#B0D9C2'],borderWidth:1,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right'}}}
+});
+
+// REPAYMENT CHART
+const repScheduled=randArr(30,2200,4800);
+const repCollected=repScheduled.map(v=>Math.random()<0.06?v*0.7:v);
+new Chart(document.getElementById('repaymentChart'),{
+  type:'line',
+  data:{
+    labels:days30,
+    datasets:[
+      {label:'Scheduled',data:repScheduled,borderColor:'rgba(168,131,42,0.6)',borderDash:[4,4],backgroundColor:'transparent',tension:0.4,pointRadius:0},
+      {label:'Collected',data:repCollected,borderColor:'rgba(42,122,75,1)',backgroundColor:'rgba(42,122,75,0.06)',fill:true,tension:0.4,pointRadius:2},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>'$'+v.toLocaleString()}}}}
+});
+
+// PORTFOLIO INDUSTRY
+new Chart(document.getElementById('portfolioIndustryChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Construction','Trucking','Restaurants','Healthcare','Retail','Landscaping'],
+    datasets:[{data:[38,22,17,12,8,3],backgroundColor:[goldC,blueC,greenC,purpleC,orangeC,redC],borderWidth:1,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right'}}}
+});
+
+// MARKETPLACE TREND
+new Chart(document.getElementById('marketplaceTrendChart'),{
+  type:'line',
+  data:{
+    labels:days30,
+    datasets:[{
+      label:'Daily Revenue',
+      data:randArr(30,200,900),
+      borderColor:goldC,
+      backgroundColor:'rgba(168,131,42,0.07)',
+      fill:true,tension:0.45,pointRadius:2
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>'$'+v}}}}
+});
+
+// LISTING TYPE BAR
+new Chart(document.getElementById('listingTypeChart'),{
+  type:'bar',
+  data:{
+    labels:['Real-Time Exclusive','Fresh (1-7 days)','Aged (7-30 days)','Aged (30+ days)','Bulk Batch'],
+    datasets:[
+      {label:'Units Sold',data:[12,34,58,22,16],backgroundColor:blueC,yAxisID:'y'},
+      {label:'Revenue ($)',data:[1800,1530,870,66,32],backgroundColor:goldC,yAxisID:'y2'},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false}},y:{type:'linear',position:'left',grid:{display:false}},y2:{type:'linear',position:'right',ticks:{callback:v=>'$'+v},grid:{color:'rgba(0,0,0,0.04)'}}}}
+});
+
+// CAPITAL ALLOCATION DONUT
+new Chart(document.getElementById('capitalAllocationChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Deployed in Active Loans','Available to Deploy'],
+    datasets:[{data:[1420000,430000],backgroundColor:[goldC,'rgba(226,224,216,0.8)'],borderWidth:1,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom'}}}
+});
+
+// RETURNS CHART
+new Chart(document.getElementById('returnsChart'),{
+  type:'bar',
+  data:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets:[
+      {label:'Gross Returns',data:[8200,11400,16800,21200,25100,27400],backgroundColor:goldLight},
+      {label:'Net to Investors',data:[8032,11172,16464,20776,24598,26852],backgroundColor:goldC},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>'$'+(v/1000)+'K'}}}}
+});
+
+// ============ TABLES ============
+
+// Activity Table
+const activities=[
+  {time:'2 min ago',event:'Deal Funded',biz:'Apex Construction LLC',tier:'gold',amt:'$280,000',rep:'Marcus R.',status:'funded'},
+  {time:'18 min ago',event:'Docs Received',biz:'Bella Rosa Restaurants',tier:'silver',amt:'$95,000',rep:'Yael S.',status:'active'},
+  {time:'34 min ago',event:'Lead Created',biz:'Metro Trucking Co.',tier:'gold',amt:'$320,000',rep:'David K.',status:'contact'},
+  {time:'1 hr ago',event:'Lead Sold (Marketplace)',biz:'Greenfield Landscaping',tier:'bronze',amt:'$18,000',rep:'—',status:'sold'},
+  {time:'1 hr ago',event:'Submitted to Lender',biz:'Crown Heights Dental',tier:'gold',amt:'$175,000',rep:'Avi T.',status:'submitted'},
+  {time:'2 hr ago',event:'Deal Funded',biz:'Park Slope Market',tier:'silver',amt:'$88,000',rep:'Sarah M.',status:'funded'},
+  {time:'3 hr ago',event:'Payment Failed',biz:'Brooklyn Bistro Group',tier:'silver',amt:'$3,200 due',rep:'—',status:'default'},
+];
+const actTbody=document.getElementById('activityTable');
+activities.forEach(a=>{
+  const statusMap={funded:'status-funded',active:'status-active',contact:'status-contact',submitted:'status-submitted',sold:'status-sold',default:'status-default'};
+  const tierMap={gold:'badge-gold',silver:'badge-silver',bronze:'badge-bronze'};
+  actTbody.innerHTML+=`<tr>
+    <td style="color:var(--muted)">${a.time}</td>
+    <td><strong>${a.event}</strong></td>
+    <td>${a.biz}</td>
+    <td><span class="badge ${tierMap[a.tier]}">${a.tier}</span></td>
+    <td style="font-weight:600">${a.amt}</td>
+    <td>${a.rep}</td>
+    <td><span class="${statusMap[a.status]}">${a.status}</span></td>
+  </tr>`;
+});
+
+// Lead Source Table
+const sources=[
+  {name:'Google Search',leads:142,gold:28,silver:54,qual:'67%',avg:'$198,400',cpl:'$112'},
+  {name:'YouTube Ads',leads:88,gold:22,silver:38,qual:'72%',avg:'$241,800',cpl:'$84'},
+  {name:'UCC Filing Lists',leads:74,gold:4,silver:18,qual:'43%',avg:'$92,000',cpl:'$1.80'},
+  {name:'Referral Partners',leads:51,gold:18,silver:28,qual:'88%',avg:'$312,000',cpl:'$0'},
+  {name:'Declined Buyback',leads:63,gold:6,silver:22,qual:'54%',avg:'$128,400',cpl:'$2.40'},
+  {name:'LinkedIn Ads',leads:32,gold:3,silver:6,qual:'38%',avg:'$174,000',cpl:'$195'},
+  {name:'Organic / SEO',leads:37,gold:1,silver:7,qual:'61%',avg:'$118,000',cpl:'$0'},
+];
+const lstTbody=document.getElementById('leadSourceTable');
+sources.forEach(s=>{
+  lstTbody.innerHTML+=`<tr>
+    <td><strong>${s.name}</strong></td>
+    <td>${s.leads}</td>
+    <td style="color:var(--gold);font-weight:600">${s.gold}</td>
+    <td style="color:var(--silver)">${s.silver}</td>
+    <td>${s.qual}</td>
+    <td>${s.avg}</td>
+    <td style="font-weight:600">${s.cpl}</td>
+  </tr>`;
+});
+
+// Industry Table
+const industries=[
+  {name:'Construction',leads:142,avg:'$268K',qual:'71%',close:'14.8%',funded:'$342K',source:'Referral / Google'},
+  {name:'Trucking',leads:88,avg:'$198K',qual:'68%',close:'11.2%',funded:'$224K',source:'UCC Lists / Google'},
+  {name:'Restaurants',leads:74,avg:'$112K',qual:'74%',close:'12.1%',funded:'$98K',source:'YouTube / Google'},
+  {name:'Healthcare',leads:51,avg:'$224K',qual:'79%',close:'18.4%',funded:'$282K',source:'Referral / LinkedIn'},
+  {name:'Landscaping',leads:63,avg:'$88K',qual:'62%',close:'9.6%',funded:'$76K',source:'Google / UCC'},
+  {name:'Retail',leads:38,avg:'$128K',qual:'65%',close:'10.2%',funded:'$114K',source:'YouTube / Google'},
+  {name:'Other',leads:31,avg:'$94K',qual:'55%',close:'7.8%',funded:'$88K',source:'Various'},
+];
+const indTbody=document.getElementById('industryTable');
+industries.forEach(i=>{
+  indTbody.innerHTML+=`<tr>
+    <td><strong>${i.name}</strong></td>
+    <td>${i.leads}</td>
+    <td>${i.avg}</td>
+    <td>${i.qual}</td>
+    <td style="font-weight:600">${i.close}</td>
+    <td style="color:var(--gold);font-weight:600">${i.funded}</td>
+    <td style="color:var(--muted)">${i.source}</td>
+  </tr>`;
+});
+
+// Deals Table
+const deals=[
+  {biz:'Apex Construction LLC',ind:'Construction',tier:'gold',req:'$280K',stage:'Funded',rep:'Marcus R.',days:1,lender:'Internal',last:'Today'},
+  {biz:'Metro Trucking Co.',ind:'Trucking',tier:'gold',req:'$320K',stage:'New Lead',rep:'David K.',days:0,lender:'—',last:'Today'},
+  {biz:'Crown Heights Dental',ind:'Healthcare',tier:'gold',req:'$175K',stage:'Submitted',rep:'Avi T.',days:3,lender:'Credibly',last:'Today'},
+  {biz:'Bella Rosa Restaurants',ind:'Restaurant',tier:'silver',req:'$95K',stage:'Docs In',rep:'Yael S.',days:2,lender:'—',last:'Today'},
+  {biz:'Park Slope Market',ind:'Retail',tier:'silver',req:'$88K',stage:'Funded',rep:'Sarah M.',days:1,lender:'OnDeck',last:'Today'},
+  {biz:'Sunrise Landscaping',ind:'Landscaping',tier:'silver',req:'$62K',stage:'Docs Requested',rep:'Josh L.',days:4,lender:'—',last:'Yesterday'},
+  {biz:'BK Haulers Inc.',ind:'Trucking',tier:'silver',req:'$140K',stage:'Approved',rep:'Marcus R.',days:1,lender:'Kapitus',last:'Yesterday'},
+  {biz:'Manhattan Med Spa',ind:'Healthcare',tier:'gold',req:'$220K',stage:'Submitted',rep:'David K.',days:5,lender:'Fundbox',last:'2 days ago'},
+];
+const dealsTbody=document.getElementById('dealsTable');
+deals.forEach(d=>{
+  const tierMap={gold:'badge-gold',silver:'badge-silver',bronze:'badge-bronze'};
+  const stageMap={
+    'Funded':'status-funded','New Lead':'status-contact','Submitted':'status-submitted',
+    'Docs In':'status-active','Docs Requested':'status-contact','Approved':'status-submitted',
+  };
+  const daysStyle=d.days>4?'color:var(--red);font-weight:700':'';
+  dealsTbody.innerHTML+=`<tr>
+    <td><strong>${d.biz}</strong></td>
+    <td>${d.ind}</td>
+    <td><span class="badge ${tierMap[d.tier]}">${d.tier}</span></td>
+    <td style="font-weight:600">${d.req}</td>
+    <td><span class="${stageMap[d.stage]||'status-contact'}">${d.stage}</span></td>
+    <td>${d.rep}</td>
+    <td style="${daysStyle}">${d.days}d</td>
+    <td style="color:var(--muted)">${d.lender}</td>
+    <td style="color:var(--muted)">${d.last}</td>
+  </tr>`;
+});
+
+// Lender Table
+const lenders=[
+  {name:'Internal (Skyline Direct)',sub:8,approved:7,funded:5,rate:'87.5%',avg:'$262K',days:2,status:'green'},
+  {name:'Credibly',sub:14,approved:11,funded:9,rate:'78.6%',avg:'$142K',days:4,status:'green'},
+  {name:'Kapitus',sub:11,approved:8,funded:6,rate:'72.7%',avg:'$188K',days:5,status:'green'},
+  {name:'OnDeck',sub:18,approved:11,funded:8,rate:'61.1%',avg:'$98K',days:3,status:'gold'},
+  {name:'Fundbox',sub:9,approved:5,funded:4,rate:'55.6%',avg:'$112K',days:6,status:'gold'},
+  {name:'Rapid Finance',sub:7,approved:3,funded:2,rate:'42.9%',avg:'$76K',days:7,status:'red'},
+];
+const lendTbody=document.getElementById('lenderTable');
+lenders.forEach(l=>{
+  const st=l.status==='green'?'status-funded':l.status==='gold'?'status-submitted':'status-default';
+  const stl=l.status==='green'?'Active':l.status==='gold'?'Monitor':'Review';
+  lendTbody.innerHTML+=`<tr>
+    <td><strong>${l.name}</strong></td>
+    <td>${l.sub}</td>
+    <td>${l.approved}</td>
+    <td style="color:var(--green);font-weight:600">${l.funded}</td>
+    <td>${l.rate}</td>
+    <td style="font-weight:600">${l.avg}</td>
+    <td>${l.days}d</td>
+    <td><span class="${st}">${stl}</span></td>
+  </tr>`;
+});
+
+// Loan Book Table
+const loans=[
+  {biz:'Apex Construction LLC',ind:'Construction',funded:'$280,000',payback:'$378,000',collected:'$56,700',remaining:'$321,300',freq:'Weekly',next:'May 19',dpd:0,status:'active'},
+  {biz:'Park Slope Market',ind:'Retail',funded:'$88,000',payback:'$118,800',collected:'$35,640',remaining:'$83,160',freq:'Daily',next:'May 14',dpd:0,status:'active'},
+  {biz:'BK Haulers Inc.',ind:'Trucking',funded:'$140,000',payback:'$189,000',collected:'$94,500',remaining:'$94,500',freq:'Weekly',next:'May 16',dpd:0,status:'active'},
+  {biz:'Brooklyn Bistro Group',ind:'Restaurant',funded:'$72,000',payback:'$97,200',collected:'$42,120',remaining:'$55,080',freq:'Daily',next:'May 14',dpd:4,status:'default'},
+  {biz:'Crown Heights Dental',ind:'Healthcare',funded:'$175,000',payback:'$236,250',collected:'$11,812',remaining:'$224,438',freq:'Weekly',next:'May 17',dpd:0,status:'active'},
+  {biz:'Sunrise Landscaping',ind:'Landscaping',funded:'$62,000',payback:'$83,700',collected:'$66,960',remaining:'$16,740',freq:'Daily',next:'May 14',dpd:0,status:'active'},
+];
+const lbTbody=document.getElementById('loanBookTable');
+loans.forEach(l=>{
+  const dpdStyle=l.dpd>0?'color:var(--red);font-weight:700':'color:var(--muted)';
+  const st=l.status==='active'?'status-active':'status-default';
+  lbTbody.innerHTML+=`<tr>
+    <td><strong>${l.biz}</strong></td>
+    <td>${l.ind}</td>
+    <td style="font-weight:600">${l.funded}</td>
+    <td>${l.payback}</td>
+    <td style="color:var(--green)">${l.collected}</td>
+    <td>${l.remaining}</td>
+    <td>${l.freq}</td>
+    <td>${l.next}</td>
+    <td style="${dpdStyle}">${l.dpd===0?'—':l.dpd+' days'}</td>
+    <td><span class="${st}">${l.status}</span></td>
+  </tr>`;
+});
+
+// Failed Payments
+const failed=[
+  {biz:'Brooklyn Bistro Group',date:'May 10',amt:'$3,200',reason:'NSF — Insufficient funds',retry:2,action:'Call borrower'},
+  {biz:'Sunrise Landscaping',date:'May 12',amt:'$1,440',reason:'Account closed — need new ACH',retry:1,action:'Urgent: new ACH auth'},
+  {biz:'Crown Street Deli',date:'May 13',amt:'$920',reason:'Bank processing delay',retry:0,action:'Auto-retry May 15'},
+];
+const fpTbody=document.getElementById('failedPaymentsTable');
+failed.forEach(f=>{
+  fpTbody.innerHTML+=`<tr>
+    <td><strong>${f.biz}</strong></td>
+    <td>${f.date}</td>
+    <td style="color:var(--red);font-weight:700">${f.amt}</td>
+    <td>${f.reason}</td>
+    <td>${f.retry}</td>
+    <td style="color:var(--orange);font-weight:600">${f.action}</td>
+  </tr>`;
+});
+
+// Buyers Table
+const buyers=[
+  {name:'Crown Heights Capital',filters:'NY, NJ — Construction, Trucking — $50K-$300K',purchases:28,spend:'$3,640',avg:'$130',type:'Real-Time',status:'active'},
+  {name:'Liberty Funding Group',filters:'FL, TX, GA — All Industries — $25K-$150K',purchases:42,spend:'$2,940',avg:'$70',type:'Fresh',status:'active'},
+  {name:'Meridian Data Inc.',filters:'All States — Restaurant, Retail — Any',purchases:184,spend:'$5,520',avg:'$30',type:'Aged',status:'active'},
+  {name:'Summit ISO Partners',filters:'NY, CA — Healthcare — $100K+',purchases:12,spend:'$2,160',avg:'$180',type:'Real-Time',status:'active'},
+  {name:'Atlas Lead Exchange',filters:'All States — All — Any',purchases:890,spend:'$4,450',avg:'$5',type:'Bulk',status:'active'},
+];
+const buyTbody=document.getElementById('buyersTable');
+buyers.forEach(b=>{
+  const typeMap={'Real-Time':'badge-gold','Fresh':'badge-blue','Aged':'badge-silver','Bulk':'badge-purple'};
+  buyTbody.innerHTML+=`<tr>
+    <td><strong>${b.name}</strong></td>
+    <td style="font-size:0.72rem;color:var(--muted)">${b.filters}</td>
+    <td>${b.purchases}</td>
+    <td style="color:var(--green);font-weight:600">${b.spend}</td>
+    <td style="font-weight:600">${b.avg}</td>
+    <td><span class="badge ${typeMap[b.type]}">${b.type}</span></td>
+    <td><span class="status-active">Active</span></td>
+  </tr>`;
+});
+
+// Unlisted Table
+const unlisted=[
+  {id:'SKY-4821',biz:'Flatbush Auto Group',ind:'Auto',tier:'silver',age:8,quality:'High — Plaid connected','est':'$28-$45',action:'List now'},
+  {id:'SKY-4798',biz:'Greenpoint Plumbing LLC',ind:'Construction',tier:'silver',age:11,quality:'Medium — statements uploaded','est':'$18-$30',action:'List now'},
+  {id:'SKY-4753',biz:'Ridgewood Pharmacy',ind:'Healthcare',tier:'gold',age:14,quality:'High — Plaid + statements','est':'$65-$120',action:'List now'},
+  {id:'SKY-4701',biz:'Crown Diner Corp',ind:'Restaurant',tier:'bronze',age:22,quality:'Low — contact only','est':'$0.50-$2',action:'List as aged'},
+  {id:'SKY-4688',biz:'Bay Ridge Roofing',ind:'Construction',tier:'silver',age:19,quality:'Medium — statements only','est':'$8-$18',action:'List now'},
+];
+const ulTbody=document.getElementById('unlistedTable');
+unlisted.forEach(u=>{
+  const tierMap={gold:'badge-gold',silver:'badge-silver',bronze:'badge-bronze'};
+  const ageStyle=u.age>15?'color:var(--red);font-weight:700':'color:var(--orange)';
+  ulTbody.innerHTML+=`<tr>
+    <td style="font-family:monospace;font-size:0.72rem;color:var(--muted)">${u.id}</td>
+    <td><strong>${u.biz}</strong></td>
+    <td>${u.ind}</td>
+    <td><span class="badge ${tierMap[u.tier]}">${u.tier}</span></td>
+    <td style="${ageStyle}">${u.age}d</td>
+    <td style="color:var(--muted)">${u.quality}</td>
+    <td style="color:var(--green);font-weight:700">${u.est}</td>
+    <td style="color:var(--gold);font-weight:600">${u.action}</td>
+  </tr>`;
+});
+
+// Investors Table and Bars
+const investors=[
+  {name:'D. Kaufman',committed:500000,deployed:420000,available:80000,earned:38400,ret:'23.1%',status:'Active',deposit:'Apr 2'},
+  {name:'A. Friedman',committed:400000,deployed:320000,available:80000,earned:28800,ret:'22.8%',status:'Active',deposit:'Mar 15'},
+  {name:'S. Goldberg',committed:300000,deployed:260000,available:40000,earned:21600,ret:'24.2%',status:'Active',deposit:'Feb 28'},
+  {name:'M. Levy',committed:250000,deployed:180000,available:70000,earned:14400,ret:'21.6%',status:'Active',deposit:'Apr 10'},
+  {name:'R. Cohen',committed:200000,deployed:160000,available:40000,earned:12800,ret:'22.4%',status:'Active',deposit:'Mar 22'},
+  {name:'Y. Berger',committed:100000,deployed:60000,available:40000,earned:3800,ret:'19.8%',status:'Active',deposit:'May 1'},
+  {name:'T. Shapiro',committed:75000,deployed:20000,available:55000,earned:800,ret:'—',status:'Pending',deposit:'May 8'},
+  {name:'B. Weiss',committed:25000,deployed:0,available:25000,earned:0,ret:'—',status:'Accreditation',deposit:'May 11'},
+];
+const invTbody=document.getElementById('investorsTable');
+const invBars=document.getElementById('investorBars');
+investors.forEach(inv=>{
+  const pct=Math.round(inv.deployed/inv.committed*100);
+  invBars.innerHTML+=`<div class="inv-bar-wrap">
+    <div class="inv-bar-label"><span>${inv.name}</span><span>${fmt(inv.deployed)} of ${fmt(inv.committed)} deployed (${pct}%)</span></div>
+    <div class="inv-track"><div class="inv-fill" style="width:${pct}%"></div></div>
+  </div>`;
+  const st=inv.status==='Active'?'status-active':inv.status==='Pending'?'status-submitted':'status-contact';
+  invTbody.innerHTML+=`<tr>
+    <td><strong>${inv.name}</strong></td>
+    <td>${fmt(inv.committed)}</td>
+    <td style="color:var(--gold);font-weight:600">${fmt(inv.deployed)}</td>
+    <td style="color:var(--green)">${fmt(inv.available)}</td>
+    <td style="color:var(--green);font-weight:600">${fmt(inv.earned)}</td>
+    <td style="font-weight:700">${inv.ret}</td>
+    <td><span class="${st}">${inv.status}</span></td>
+    <td style="color:var(--muted)">${inv.deposit}</td>
+  </tr>`;
+});
+
+// Deployments Table
+const deployments=[
+  {loan:'SKY-L001',biz:'Apex Construction LLC',inv:'D. Kaufman',deployed:'$168,000',pct:'60%',expRet:'34.2%',earned:'$10,206',status:'active'},
+  {loan:'SKY-L001',biz:'Apex Construction LLC',inv:'A. Friedman',deployed:'$112,000',pct:'40%',expRet:'34.2%',earned:'$6,804',status:'active'},
+  {loan:'SKY-L002',biz:'BK Haulers Inc.',inv:'S. Goldberg',deployed:'$140,000',pct:'100%',expRet:'35.0%',earned:'$18,900',status:'active'},
+  {loan:'SKY-L003',biz:'Crown Heights Dental',inv:'D. Kaufman',deployed:'$87,500',pct:'50%',expRet:'35.2%',earned:'$591',status:'active'},
+  {loan:'SKY-L003',biz:'Crown Heights Dental',inv:'M. Levy',deployed:'$87,500',pct:'50%',expRet:'35.2%',earned:'$591',status:'active'},
+  {loan:'SKY-L004',biz:'Park Slope Market',inv:'A. Friedman',deployed:'$88,000',pct:'100%',expRet:'35.0%',earned:'$10,710',status:'active'},
+];
+const dployTbody=document.getElementById('deploymentTable');
+deployments.forEach(d=>{
+  dployTbody.innerHTML+=`<tr>
+    <td style="font-family:monospace;font-size:0.72rem;color:var(--muted)">${d.loan}</td>
+    <td><strong>${d.biz}</strong></td>
+    <td>${d.inv}</td>
+    <td style="font-weight:600">${d.deployed}</td>
+    <td>${d.pct}</td>
+    <td>${d.expRet}</td>
+    <td style="color:var(--green);font-weight:600">${d.earned}</td>
+    <td><span class="status-active">Repaying</span></td>
+  </tr>`;
+});
+
+</script>
+</body>
+</html>
