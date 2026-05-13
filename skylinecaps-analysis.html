@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyline Capital — Competitive Intelligence Dashboard</title>
+    <style>
+        :root {
+            --primary: #0a0a0a;
+            --secondary: #111827;
+            --accent: #C9A84C;
+            --gold: #C9A84C;
+            --gold-light: #E0C070;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --info: #60a5fa;
+            --purple: #8b5cf6;
+            --card-bg: #1f2937;
+            --card-bg-dark: #111827;
+            --border: #374151;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle { color: var(--text-muted); font-size: 1.1rem; }
+
+        h2 {
+            font-size: 1.75rem;
+            color: var(--gold);
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        h3 { font-size: 1.35rem; color: var(--text); margin: 2rem 0 1rem; }
+        h4 { font-size: 1.1rem; color: var(--gold); margin: 1.5rem 0 0.75rem; }
+        h5 { font-size: 1rem; color: var(--text); margin: 1rem 0 0.5rem; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Market Stats Hero */
+        .market-hero {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .market-stat {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(201, 168, 76, 0.05) 100%);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .market-stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .market-stat-label { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(201, 168, 76, 0.1); color: var(--gold); font-weight: 600; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .table-scroll { overflow-x: auto; }
+
+        /* Metrics Grid */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .metric-item {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value { font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+        .metric-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        .growth-positive { color: var(--success); }
+        .growth-negative { color: var(--danger); }
+
+        /* Tech Stack Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tech-category {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .tech-category-title {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tech-tool {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0;
+            font-size: 0.85rem;
+        }
+
+        .tech-tool-icon { color: var(--success); }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-leader { background: var(--danger); color: white; }
+        .badge-declining { background: #f97316; color: white; }
+        .badge-rising { background: var(--purple); color: white; }
+        .badge-stable { background: var(--warning); color: #1a1a2e; }
+        .badge-low { background: var(--success); color: #1a1a2e; }
+        .badge-dormant { background: var(--text-muted); color: #1a1a2e; }
+        .badge-skyline { background: var(--gold); color: #0a0a0a; }
+
+        .arch-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .arch-full { background: var(--success); color: #1a1a2e; }
+        .arch-hybrid { background: var(--info); color: #1a1a2e; }
+        .arch-leadgen { background: var(--warning); color: #1a1a2e; }
+        .arch-legacy { background: var(--text-muted); color: #1a1a2e; }
+
+        /* AI Intelligence Section */
+        .ai-section {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.05) 0%, rgba(96, 165, 250, 0.05) 100%);
+            border: 1px solid rgba(201, 168, 76, 0.4);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-icon { font-size: 2rem; }
+
+        .ai-title {
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+
+        .ai-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Review Section */
+        .review-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .review-positive { border-left: 3px solid var(--success); }
+        .review-negative { border-left: 3px solid var(--danger); }
+
+        .review-themes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* Opportunities Box */
+        .opportunities-box {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(74, 222, 128, 0.05) 100%);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Key Takeaway */
+        .key-takeaway {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.03) 100%);
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Star Rating */
+        .stars { color: var(--gold); letter-spacing: 2px; }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: var(--border);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+        }
+
+        /* Quote */
+        .quote {
+            font-style: italic;
+            padding: 0.5rem 0;
+            border-left: 2px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .quote-source { font-style: normal; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Navigation */
+        .nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover { color: var(--gold); background: rgba(201, 168, 76, 0.1); }
+
+        /* Highlight */
+        .highlight {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(201, 168, 76, 0.05) 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
+            margin: 1.5rem 0;
+        }
+
+        /* List styles */
+        .feature-list { list-style: none; }
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+        }
+
+        /* Waterfall diagram */
+        .waterfall {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 1rem 0;
+        }
+        .waterfall-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+        }
+        .wf-label { font-size: 0.85rem; }
+        .wf-meta { font-size: 0.75rem; opacity: 0.7; }
+
+        /* Revenue stream bar */
+        .rev-bar-row { margin-bottom: 0.9rem; }
+        .rev-bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.3rem; }
+        .rev-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .rev-fill { height: 100%; border-radius: 4px; }
+
+        /* Password gate */
+        #pw-gate{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
+        #pw-gate.hidden{display:none}
+        .pw-box{background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:2.5rem 2.75rem;text-align:center;width:340px;max-width:90vw}
+        .pw-logo{height:26px;margin:0 auto 1.5rem;display:block}
+        .pw-title{font-size:1rem;font-weight:700;color:white;margin-bottom:0.25rem}
+        .pw-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:1.5rem}
+        .pw-input{width:100%;background:#111;border:1px solid #444;border-radius:6px;color:white;font-family:inherit;font-size:0.9rem;padding:0.7rem 1rem;outline:none;letter-spacing:0.06em;text-align:center}
+        .pw-input:focus{border-color:var(--gold)}
+        .pw-btn{width:100%;margin-top:0.9rem;padding:0.7rem;background:var(--gold);color:#0a0a0a;border:none;border-radius:6px;font-family:inherit;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer}
+        .pw-btn:hover{background:var(--gold-light)}
+        .pw-err{font-size:0.7rem;color:#F87171;margin-top:0.5rem;min-height:1rem}
+
+        .data-source {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 1024px) {
+            .market-hero { grid-template-columns: repeat(2, 1fr); }
+            .review-themes { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.75rem; }
+            .market-hero { grid-template-columns: 1fr; }
+            .market-stat-value { font-size: 1.75rem; }
+            .tech-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="pw-box">
+    <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png" class="pw-logo" alt="FuturProof Labs" onerror="this.style.display='none'">
+    <div class="pw-title">Skyline Capital</div>
+    <div class="pw-sub">Competitive Intelligence — Restricted Access</div>
+    <input id="pw-input" class="pw-input" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Access Report</button>
+    <div class="pw-err" id="pw-err"></div>
+  </div>
+</div>
+
+    <nav class="nav">
+        <div class="nav-links">
+            <a href="#market">Market</a>
+            <a href="#overview">Overview</a>
+            <a href="#tech-stack">Tech Stack</a>
+            <a href="#lendingtree">LendingTree</a>
+            <a href="#lendio">Lendio</a>
+            <a href="#kabbage">Kabbage / AmEx</a>
+            <a href="#nav">Nav</a>
+            <a href="#businessloans">BusinessLoans.com</a>
+            <a href="#skyline-position">Skyline Position</a>
+            <a href="#keywords">Keywords</a>
+            <a href="#opportunities">Opportunities</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Skyline Capital — Competitive Intelligence</h1>
+            <p class="subtitle">US SMB Alternative Lending Market Analysis | May 2026</p>
+        </header>
+
+        <!-- ==================== MARKET ANALYSIS ==================== -->
+        <section id="market">
+            <h2>📊 US SMB Alternative Lending Market</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The addressable market for small business alternative capital — MCA, bridge, revenue-based financing, and broker-placed term loans</p>
+
+            <div class="market-hero">
+                <div class="market-stat">
+                    <div class="market-stat-value">$200B</div>
+                    <div class="market-stat-label">Total SMB Lending Gap (Annual)</div>
+                </div>
+                <div class="market-stat">
+                    <div class="market-stat-value">$19B</div>
+                    <div class="market-stat-label">MCA Market Volume (2024)</div>
+                </div>
+                <div class="market-stat">
+                    <div class="market-stat-value">80%</div>
+                    <div class="market-stat-label">SMB Bank Decline Rate</div>
+                </div>
+                <div class="market-stat">
+                    <div class="market-stat-value">33M</div>
+                    <div class="market-stat-label">US Small Businesses</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Core Insight:</strong> Banks decline 80% of small business loan applications — not because the businesses are bad, but because the underwriting model requires tax returns, 2+ years of profitability, and collateral that most growing businesses cannot provide. Alternative lenders fill this gap with bank-statement-only underwriting, 24-72 hour decisions, and factor-rate pricing. The SMB alt lending market grows at 25%+ CAGR. No single player controls more than 3-4% of volume. The field is wide open.
+            </div>
+
+            <div class="card">
+                <h4>Revenue Streams Available in This Market</h4>
+                <div class="rev-bar-row">
+                    <div class="rev-bar-label"><span>Lead Origination + Data Resale</span><span style="color:var(--gold)">$0.50 - $200 per lead</span></div>
+                    <div class="rev-track"><div class="rev-fill" style="width:90%;background:#C9A84C"></div></div>
+                </div>
+                <div class="rev-bar-row">
+                    <div class="rev-bar-label"><span>Brokerage Commissions</span><span style="color:var(--success)">8-12% of funded amount</span></div>
+                    <div class="rev-track"><div class="rev-fill" style="width:80%;background:#4ade80"></div></div>
+                </div>
+                <div class="rev-bar-row">
+                    <div class="rev-bar-label"><span>Direct Lending (MCA / Bridge)</span><span style="color:var(--info)">30-50% annualized returns</span></div>
+                    <div class="rev-track"><div class="rev-fill" style="width:95%;background:#60a5fa"></div></div>
+                </div>
+                <div class="rev-bar-row">
+                    <div class="rev-bar-label"><span>Investor Capital Management</span><span style="color:var(--purple)">20-25% returns to investors</span></div>
+                    <div class="rev-track"><div class="rev-fill" style="width:75%;background:#8b5cf6"></div></div>
+                </div>
+                <div class="rev-bar-row">
+                    <div class="rev-bar-label"><span>B2B Data Marketplace</span><span style="color:var(--warning)">$500 - $25K per dataset</span></div>
+                    <div class="rev-track"><div class="rev-fill" style="width:60%;background:#fbbf24"></div></div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.75rem;">No direct competitor operates all five simultaneously. This is Skyline's structural advantage.</p>
+            </div>
+        </section>
+
+        <!-- ==================== EXECUTIVE OVERVIEW ==================== -->
+        <section id="overview">
+            <h2>📈 Competitor Overview</h2>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Competitor</th>
+                            <th>Model</th>
+                            <th>Monthly Visits</th>
+                            <th>Revenue Est.</th>
+                            <th>Loan Range</th>
+                            <th>Approval Speed</th>
+                            <th>Revenue Streams</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LendingTree Business</strong></td>
+                            <td>Lead Gen Marketplace</td>
+                            <td>1.3M SMB</td>
+                            <td>$120M+ (biz segment)</td>
+                            <td>$1K - $500K</td>
+                            <td>3-7 days</td>
+                            <td>1 (lead fees)</td>
+                            <td><span class="badge badge-leader">Market Leader</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lendio</strong></td>
+                            <td>Broker Marketplace</td>
+                            <td>430K</td>
+                            <td>$80M+</td>
+                            <td>$5K - $5M</td>
+                            <td>24-72 hrs</td>
+                            <td>2 (commissions + data)</td>
+                            <td><span class="badge badge-stable">Established</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kabbage / AmEx Blueprint</strong></td>
+                            <td>Direct Lender</td>
+                            <td>210K</td>
+                            <td>$850M acquisition</td>
+                            <td>$2K - $150K</td>
+                            <td>Same day</td>
+                            <td>1 (interest income)</td>
+                            <td><span class="badge badge-declining">A-Paper Only</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nav</strong></td>
+                            <td>Credit Monitor + Marketplace</td>
+                            <td>380K</td>
+                            <td>$50M+</td>
+                            <td>$5K - $150K</td>
+                            <td>1-5 days</td>
+                            <td>2 (subscriptions + referrals)</td>
+                            <td><span class="badge badge-stable">Niche</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>BusinessLoans.com</strong></td>
+                            <td>Lead Gen</td>
+                            <td>95K</td>
+                            <td>$10M est.</td>
+                            <td>$5K - $500K</td>
+                            <td>1-3 days</td>
+                            <td>1 (lead fees)</td>
+                            <td><span class="badge badge-dormant">Thin Moat</span></td>
+                        </tr>
+                        <tr style="background: rgba(201,168,76,0.06);">
+                            <td><strong>Skyline Capital (Target)</strong></td>
+                            <td>Full Stack: Lead + Broker + Direct + Investors + Data</td>
+                            <td>Building</td>
+                            <td>$450K/mo (Month 6 target)</td>
+                            <td>$100K - $1M</td>
+                            <td>24-48 hrs</td>
+                            <td><strong style="color:var(--gold)">5 (all streams)</strong></td>
+                            <td><span class="badge badge-skyline">Entering</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================== TECH STACK COMPARISON ==================== -->
+        <section id="tech-stack">
+            <h2>⚙️ Platform Architecture Comparison</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Underwriting infrastructure, lead routing, CRM, compliance stack, and data capabilities</p>
+
+            <!-- Architecture Legend -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: rgba(74, 222, 128, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 1rem;">
+                    <div style="color: var(--success); font-weight: 600; margin-bottom: 0.5rem;">FULL STACK</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Lead origination + direct lending + broker + investor portal + data marketplace</div>
+                </div>
+                <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid var(--info); border-radius: 8px; padding: 1rem;">
+                    <div style="color: var(--info); font-weight: 600; margin-bottom: 0.5rem;">HYBRID</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Marketplace + commission model, limited direct lending exposure</div>
+                </div>
+                <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid var(--warning); border-radius: 8px; padding: 1rem;">
+                    <div style="color: var(--warning); font-weight: 600; margin-bottom: 0.5rem;">LEAD GEN</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Pure lead distribution, no lending balance sheet, no broker placement</div>
+                </div>
+                <div style="background: rgba(160, 160, 160, 0.1); border: 1px solid var(--text-muted); border-radius: 8px; padding: 1rem;">
+                    <div style="color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">NICHE</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Credit monitoring or single-product lending without full stack capability</div>
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Architecture</th>
+                            <th>Underwriting</th>
+                            <th>CRM / Pipeline</th>
+                            <th>Compliance</th>
+                            <th>Data Layer</th>
+                            <th>Investor Portal</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LendingTree Business</strong></td>
+                            <td><span class="arch-badge arch-leadgen">LEAD GEN</span></td>
+                            <td>None — passes to lenders</td>
+                            <td>Proprietary match algorithm</td>
+                            <td>RESPA, state lead laws</td>
+                            <td>Aggregated lender data, sold back to market</td>
+                            <td>None</td>
+                            <td class="stars">⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lendio</strong></td>
+                            <td><span class="arch-badge arch-hybrid">HYBRID</span></td>
+                            <td>75+ lender integrations</td>
+                            <td>Custom CRM, advisor model</td>
+                            <td>State broker licenses</td>
+                            <td>Limited — no resale program</td>
+                            <td>None</td>
+                            <td class="stars">⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kabbage / AmEx Blueprint</strong></td>
+                            <td><span class="arch-badge arch-hybrid">HYBRID</span></td>
+                            <td>Automated bank + QuickBooks pull</td>
+                            <td>None — no broker layer</td>
+                            <td>Full federal bank reg (AmEx)</td>
+                            <td>Internal only</td>
+                            <td>None</td>
+                            <td class="stars">⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nav</strong></td>
+                            <td><span class="arch-badge arch-leadgen">NICHE</span></td>
+                            <td>Credit score gating + marketplace passthrough</td>
+                            <td>None — referral model only</td>
+                            <td>Credit bureau agreements</td>
+                            <td>Business credit reporting</td>
+                            <td>None</td>
+                            <td class="stars">⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BusinessLoans.com</strong></td>
+                            <td><span class="arch-badge arch-leadgen">LEAD GEN</span></td>
+                            <td>None</td>
+                            <td>Basic lead routing</td>
+                            <td>Minimal</td>
+                            <td>None</td>
+                            <td>None</td>
+                            <td class="stars">⭐⭐</td>
+                        </tr>
+                        <tr style="background: rgba(201,168,76,0.06);">
+                            <td><strong>Skyline Capital (Build Target)</strong></td>
+                            <td><span class="arch-badge arch-full">FULL STACK</span></td>
+                            <td>Plaid bank verification + custom scoring</td>
+                            <td>Full CRM: pipeline, reps, commissions</td>
+                            <td>CA SB 1235, NY CFDL, Reg D, KYB/OFAC</td>
+                            <td>Tiered lead resale + B2B marketplace</td>
+                            <td>Full Reg D investor portal</td>
+                            <td class="stars">⭐⭐⭐⭐⭐</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem;">
+                <h4>Skyline Target Stack</h4>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">Next.js 15</div>
+                        <div class="metric-label">App Router</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">Supabase</div>
+                        <div class="metric-label">Database + Auth + RLS</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">Plaid</div>
+                        <div class="metric-label">Bank Verification</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">Stripe</div>
+                        <div class="metric-label">Payments + ACH</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">Middesk</div>
+                        <div class="metric-label">KYB / OFAC</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">Resend</div>
+                        <div class="metric-label">Transactional Email</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LENDINGTREE INTELLIGENCE ==================== -->
+        <section id="lendingtree">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-title">LendingTree Business: Competitive Intelligence</div>
+                        <div class="ai-subtitle">The dominant lead marketplace — analyzing the playbook and its ceiling</div>
+                    </div>
+                </div>
+
+                <h4>📊 Business Model Analysis</h4>
+                <ul class="feature-list">
+                    <li><strong>Model:</strong> Pure lead aggregator — they take applications and sell them to 1,300+ lenders. Never touch the loan.</li>
+                    <li><strong>Revenue:</strong> Lenders pay per-lead or monthly subscription. Business lending segment ~$120M/year of total $1.1B revenue.</li>
+                    <li><strong>Traffic:</strong> 1.3M SMB visits/month — built on 20+ years of content, SEO, and TV spend.</li>
+                    <li><strong>Lead Quality Problem:</strong> Same application goes to 5-8 lenders simultaneously. Lenders hate it. Conversion rates are declining as lenders reduce bids.</li>
+                    <li><strong>Approval Range:</strong> Broad ($1K - $500K) but quality is mixed. No qualification gate — anyone can apply.</li>
+                    <li><strong>SEO Moat:</strong> 40,000+ indexed pages including "business loan calculator," "SBA loan rates," and every state permutation.</li>
+                </ul>
+
+                <h4>🛠️ Technology Stack</h4>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <div class="tech-category-title">Lead Infrastructure</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Proprietary matching algorithm</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Real-time lender bidding</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Multi-lender distribution API</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> My LendingTree borrower portal</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Data and Analytics</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Aggregated rate benchmarking</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Credit monitoring integration</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Lender performance scoring</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✗</span> No direct underwriting</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Marketing</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> TV + radio national spend</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Google Ads ($2M+/mo est.)</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Content marketing engine</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Email / remarketing</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">What They Cannot Do</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No direct lending</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No investor capital</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No exclusive lead routing</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No data resale marketplace</div>
+                    </div>
+                </div>
+
+                <h4>⭐ Borrower Sentiment (Google / Trustpilot)</h4>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <span class="stars">⭐⭐⭐</span>
+                    <span>3.1/5 average — heavy complaint volume</span>
+                </div>
+                <div class="review-themes">
+                    <div>
+                        <h5 style="color: var(--success);">What borrowers like</h5>
+                        <div class="review-box review-positive">
+                            <p>"Easy to compare multiple options in one place"</p>
+                            <p>"Got 4 offers within hours of applying"</p>
+                            <p>"Good for seeing what rates look like before committing"</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 style="color: var(--danger);">Consistent complaints</h5>
+                        <div class="review-box review-negative">
+                            <p>"Sold my information to 8 lenders — phone never stopped ringing"</p>
+                            <p>"Applied for $200K, got offers for $15K from predatory lenders"</p>
+                            <p>"No one explains terms, just tries to close as fast as possible"</p>
+                            <p>"Called 11 times in one day from different lenders"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>📉 The Lender Side Problem</h4>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">5-8x</div>
+                        <div class="metric-label">Avg Lead Distribution</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">12-18%</div>
+                        <div class="metric-label">Lender Close Rate (declining)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$35-120</div>
+                        <div class="metric-label">Lender Cost Per Lead</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">High</div>
+                        <div class="metric-label">Lender Churn Rate</div>
+                    </div>
+                </div>
+
+                <div class="opportunities-box">
+                    <h4 style="margin-top: 0;">Where Skyline Wins Against LendingTree</h4>
+                    <ul class="feature-list">
+                        <li><strong>Exclusive lead routing:</strong> Gold leads go to one lender/direct — no multi-sell. Lenders pay premium for this.</li>
+                        <li><strong>Qualification gate:</strong> 12+ months, $50K/mo deposits. Every lead that enters the waterfall is pre-qualified. LendingTree has no gate.</li>
+                        <li><strong>Direct lending option:</strong> Skyline can fund deals directly and capture the full return instead of selling to a lender.</li>
+                        <li><strong>Data marketplace:</strong> Skyline can resell declined leads as a revenue stream. LendingTree discards them.</li>
+                        <li><strong>$100K-$1M sweet spot:</strong> LendingTree's average funded amount is much lower — Skyline targets higher-quality, higher-margin deals.</li>
+                    </ul>
+                </div>
+
+                <div class="key-takeaway">
+                    <h4 style="margin-top: 0;">Key Takeaway</h4>
+                    <p>LendingTree is the category reference point, not the model to copy. Their scale creates a lead quality crisis — lenders are paying $35-120 for a lead already sold to 7 competitors. Skyline's exclusivity model is the direct answer to lender fatigue with LendingTree. Position against them explicitly: "One qualified lead, one placement, one relationship."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LENDIO INTELLIGENCE ==================== -->
+        <section id="lendio">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-title">Lendio: Competitive Intelligence</div>
+                        <div class="ai-subtitle">The broker marketplace model — closest operational analog to Skyline's brokerage stream</div>
+                    </div>
+                </div>
+
+                <h4>📊 Business Model Analysis</h4>
+                <ul class="feature-list">
+                    <li><strong>Model:</strong> Broker marketplace — single application submitted to 75+ lenders, advisor team closes on the best offer.</li>
+                    <li><strong>Volume:</strong> $12B+ total funded since founding. 230,000+ businesses funded.</li>
+                    <li><strong>Revenue:</strong> Commission-based (percentage of funded amount) + some lender subscription fees.</li>
+                    <li><strong>Advisor Model:</strong> Dedicated loan specialist walks borrowers through options — higher touch than LendingTree's self-serve.</li>
+                    <li><strong>Target Range:</strong> $5K - $5M, but sweet spot is $25K-$250K.</li>
+                    <li><strong>Franchise Model:</strong> Lendio Franchise allows local operators to run branded branches — creates geographic reach without headcount.</li>
+                </ul>
+
+                <h4>🛠️ Technology Stack</h4>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <div class="tech-category-title">Application + Routing</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Single-application flow</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> 75+ lender integrations</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Offer comparison engine</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Digital doc collection</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">CRM and Ops</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Custom internal CRM</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Advisor pipeline tracking</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Commission automation</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✗</span> No direct lending balance sheet</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">What Lendio Cannot Do</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No direct lending</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No investor capital program</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No lead data resale</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No marketplace for rejected leads</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Marketing</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Google Ads — heavy spend</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> SEO content strategy</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Franchise referral network</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Partner integrations (QuickBooks, etc.)</div>
+                    </div>
+                </div>
+
+                <h4>⭐ Borrower Sentiment</h4>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <span class="stars">⭐⭐⭐⭐</span>
+                    <span>4.1/5 — better than LendingTree due to advisor model</span>
+                </div>
+                <div class="review-themes">
+                    <div>
+                        <h5 style="color: var(--success);">Positive Themes</h5>
+                        <div class="review-box review-positive">
+                            <p>"My advisor walked me through every option, didn't just push the first one"</p>
+                            <p>"Got funded in 48 hours — process was smooth"</p>
+                            <p>"Way better than going to a bank that would have said no"</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 style="color: var(--danger);">Complaints</h5>
+                        <div class="review-box review-negative">
+                            <p>"Rates are high — 40-50% factor rates on MCA"</p>
+                            <p>"They prioritize lenders who pay them more, not best deal for borrower"</p>
+                            <p>"Couldn't get funded above $75K even with solid revenue"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opportunities-box">
+                    <h4 style="margin-top: 0;">Where Skyline Wins Against Lendio</h4>
+                    <ul class="feature-list">
+                        <li><strong>Higher loan range:</strong> Lendio's sweet spot is $25K-$250K. Skyline targets $100K-$1M — bigger commissions per deal.</li>
+                        <li><strong>Direct lending option:</strong> Lendio always brokers. Skyline can fund directly when the deal qualifies — capturing 3-4x the margin.</li>
+                        <li><strong>Investor capital flywheel:</strong> Skyline's Reg D investor pool funds direct deals. Lendio has no capital deployment capability.</li>
+                        <li><strong>Data monetization:</strong> Every declined application has value. Lendio discards them. Skyline routes them to marketplace buyers.</li>
+                    </ul>
+                </div>
+
+                <div class="key-takeaway">
+                    <h4 style="margin-top: 0;">Key Takeaway</h4>
+                    <p>Lendio is the closest structural analog to Skyline's brokerage stream — but they stop there. Their advisor model and 75-lender network proves that a high-touch broker approach outperforms self-serve lead gen. Skyline adopts the Lendio advisor model for Gold and Silver leads, then adds 4 revenue streams that Lendio will never build.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== KABBAGE / AMEX INTELLIGENCE ==================== -->
+        <section id="kabbage">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-title">Kabbage / AmEx Blueprint: Competitive Intelligence</div>
+                        <div class="ai-subtitle">The direct lender that got absorbed — a cautionary tale and a market opening</div>
+                    </div>
+                </div>
+
+                <h4>📊 Business Model Analysis</h4>
+                <ul class="feature-list">
+                    <li><strong>History:</strong> Kabbage founded 2009, acquired by American Express in 2020 for $850M.</li>
+                    <li><strong>Current State:</strong> Rebranded as AmEx Business Blueprint — working capital lines up to $150K for existing AmEx customers.</li>
+                    <li><strong>Critical Shift:</strong> From independent alternative lender to AmEx product. Now A-paper only — requires strong business credit, AmEx relationship preferred.</li>
+                    <li><strong>Range:</strong> $2K - $150K working capital lines. This is now a corporate bank product, not an alternative lender.</li>
+                    <li><strong>Speed:</strong> Same-day decisions for existing AmEx customers. 1-3 days for new applicants who qualify.</li>
+                    <li><strong>Market Abandoned:</strong> Kabbage's original market — B and C paper SMBs — is now completely unserved by this entity.</li>
+                </ul>
+
+                <h4>🛠️ Technology Stack</h4>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <div class="tech-category-title">Underwriting</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Automated bank data pull</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> QuickBooks/accounting integration</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> AmEx internal credit model</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Real-time decisioning (for AmEx customers)</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Banking Integration</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> AmEx banking infrastructure</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> ACH / wire payment rails</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Business checking account</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Full federal regulatory compliance</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">What They Cannot Do</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No B/C paper lending</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No loans above $150K</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No broker placement</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No investor capital program</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Distribution</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> AmEx existing customer base</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Online application portal</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No affiliate/ISO network</div>
+                    </div>
+                </div>
+
+                <h4>📉 Market Gap Created by the Acquisition</h4>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">$150K</div>
+                        <div class="metric-label">Hard Cap (Left $250K-$1M unserved)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">A Paper</div>
+                        <div class="metric-label">Only Grade Served Now</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">850K+</div>
+                        <div class="metric-label">Former Kabbage Users Displaced</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$0</div>
+                        <div class="metric-label">Kabbage ISO/Broker Network (dissolved)</div>
+                    </div>
+                </div>
+
+                <div class="opportunities-box">
+                    <h4 style="margin-top: 0;">The Kabbage Displacement Opportunity</h4>
+                    <ul class="feature-list">
+                        <li><strong>850K businesses abandoned:</strong> Former Kabbage customers who grew above $150K or don't qualify under AmEx criteria are actively seeking alternatives.</li>
+                        <li><strong>B/C paper vacuum:</strong> Kabbage used to serve this segment. No major brand serves it now with Kabbage's UX and speed.</li>
+                        <li><strong>"Kabbage alternative" keyword:</strong> Real search volume from displaced users — own it.</li>
+                        <li><strong>ISO channel:</strong> Kabbage's ISO/broker network was shut down. Those brokers need a new partner — Skyline can recruit them.</li>
+                        <li><strong>$150K-$1M gap:</strong> Kabbage's hard cap at $150K + banks starting at $500K creates a $350K gap Skyline owns.</li>
+                    </ul>
+                </div>
+
+                <div class="key-takeaway">
+                    <h4 style="margin-top: 0;">Key Takeaway</h4>
+                    <p>The Kabbage acquisition is the single biggest market opening in SMB alt lending since 2020. American Express turned an alternative lender into a premium bank product — abandoning hundreds of thousands of businesses that don't fit the AmEx customer profile. Skyline's $100K-$1M target with bank-statement-only underwriting is the direct replacement. Target "kabbage alternative," "kabbage loan," and displaced borrowers who got rejected post-acquisition.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== NAV INTELLIGENCE ==================== -->
+        <section id="nav">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-title">Nav: Competitive Intelligence</div>
+                        <div class="ai-subtitle">The credit-first marketplace — a useful reference for the underserved end of the market</div>
+                    </div>
+                </div>
+
+                <h4>📊 Business Model Analysis</h4>
+                <ul class="feature-list">
+                    <li><strong>Model:</strong> Business credit monitoring as the entry product, loan marketplace as the revenue layer.</li>
+                    <li><strong>Users:</strong> ~700,000 registered businesses, primarily early-stage and credit-building.</li>
+                    <li><strong>Revenue:</strong> Subscription tiers ($0 free / $49.99 / $99.99/mo) + lender referral commissions.</li>
+                    <li><strong>Positioning:</strong> Targets businesses that don't yet qualify — helps them build credit to eventually get funded.</li>
+                    <li><strong>Loan Range:</strong> Marketplace passthrough, typically $5K-$150K, depends on lender matches.</li>
+                    <li><strong>Structural Limit:</strong> Nav's user base skews toward businesses that aren't ready — conversion to funding is low.</li>
+                </ul>
+
+                <h4>🛠️ Technology Stack</h4>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <div class="tech-category-title">Core Product</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Business credit monitoring</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> D&B, Experian, Equifax biz bureau pulls</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Credit score simulator</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Business identity monitoring</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">Marketplace Layer</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Lender matching engine</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Pre-qualification scoring</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No direct lending</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No broker placement</div>
+                    </div>
+                </div>
+
+                <div class="opportunities-box">
+                    <h4 style="margin-top: 0;">Where Skyline Wins Against Nav</h4>
+                    <ul class="feature-list">
+                        <li><strong>No subscription friction:</strong> Skyline's funnel goes straight to funding — no monthly fee to "build up" to qualifying.</li>
+                        <li><strong>Higher deal quality:</strong> Nav's user base skews Bronze and sub-Bronze. Skyline's $50K/mo deposit gate keeps leads fundable.</li>
+                        <li><strong>Speed:</strong> Nav routes to marketplace which routes to lenders — multi-step delay. Skyline can fund directly in 24 hours.</li>
+                        <li><strong>Recycle model:</strong> Nav's users who don't qualify yet are worth nothing to Nav. Skyline buys or collects those leads from Nav's overflow for the data marketplace.</li>
+                    </ul>
+                </div>
+
+                <div class="key-takeaway">
+                    <h4 style="margin-top: 0;">Key Takeaway</h4>
+                    <p>Nav is not a direct threat — they serve a different credit tier and monetize slowly through subscriptions. The opportunity is to purchase aged Nav-grade leads for the data marketplace (Bronze tier resale) while Skyline serves the fundable customers Nav cannot place. Nav's 700K registered businesses represent a B2B data acquisition target.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== BUSINESSLOANS.COM INTELLIGENCE ==================== -->
+        <section id="businessloans">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-title">BusinessLoans.com: Competitive Intelligence</div>
+                        <div class="ai-subtitle">A thin-moat lead gen site — showing what Skyline should not be built like</div>
+                    </div>
+                </div>
+
+                <h4>📊 Business Model Analysis</h4>
+                <ul class="feature-list">
+                    <li><strong>Model:</strong> Pure lead gen form — collects applications and sells to lenders. No advisor, no matching algorithm, no value add.</li>
+                    <li><strong>Traffic:</strong> ~95K monthly visits, primarily from branded and generic paid search.</li>
+                    <li><strong>Revenue:</strong> Estimated $10M/year in lead sales.</li>
+                    <li><strong>Product:</strong> Basically a form connected to a lead distribution system. No content moat, no brand.</li>
+                    <li><strong>Moat:</strong> Domain name. That is the only defensible asset.</li>
+                    <li><strong>Weakness:</strong> Zero differentiation from dozens of similar sites (fundera.com, fundinghero.com, etc.)</li>
+                </ul>
+
+                <h4>🛠️ Technology Stack</h4>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <div class="tech-category-title">Platform</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Basic CMS / WordPress likely</div>
+                        <div class="tech-tool"><span class="tech-tool-icon">✓</span> Lead form + submission routing</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No matching algorithm</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No underwriting</div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-category-title">What's Missing</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No advisor/consultant layer</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No investor capital</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No CRM or pipeline</div>
+                        <div class="tech-tool"><span style="color:var(--danger)">✗</span> No data marketplace</div>
+                    </div>
+                </div>
+
+                <div class="opportunities-box">
+                    <h4 style="margin-top: 0;">What This Tells Skyline</h4>
+                    <ul class="feature-list">
+                        <li><strong>Domain name matters:</strong> skylinecaps.com is a business asset — protect it and build SEO authority around it early.</li>
+                        <li><strong>Content beats the form:</strong> BusinessLoans.com has no content moat. Skyline builds content authority around industry-specific and intent-specific keywords.</li>
+                        <li><strong>Differentiation wins immediately:</strong> Any advisor layer, qualification gate, or direct lending capability instantly differentiates Skyline from this entire segment.</li>
+                        <li><strong>Purchase leads from players like this:</strong> Sites like BusinessLoans.com generate leads they cannot fully monetize. They're a wholesale lead supplier for Skyline's data marketplace.</li>
+                    </ul>
+                </div>
+
+                <div class="key-takeaway">
+                    <h4 style="margin-top: 0;">Key Takeaway</h4>
+                    <p>BusinessLoans.com represents the floor of this market — a domain name with a form. It proves that low-quality lead gen generates revenue but has no ceiling, no moat, and no compounding value. Skyline should not compete with this model — it should extract value from it by purchasing their wholesale leads for the data marketplace at pennies on the dollar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SKYLINE POSITIONING ==================== -->
+        <section id="skyline-position">
+            <h2>🏆 Skyline Capital — Market Position</h2>
+
+            <div class="highlight">
+                <strong>The Core Insight:</strong> Every competitor in this market runs one or two revenue streams. LendingTree sells leads. Lendio brokers loans. Kabbage lends directly. Nav charges subscriptions. Nobody has built the full stack — originate, tier, broker, lend directly, deploy investor capital, and resell the remainder as data. Skyline's architecture is the only model where the net cost of lead generation approaches zero.
+            </div>
+
+            <div class="card">
+                <h4>The Waterfall — How Skyline Monetizes Every Lead</h4>
+                <div class="waterfall">
+                    <div class="waterfall-step" style="background:#2A7A4B;width:100%">
+                        <span class="wf-label">Inbound Lead (All Sources)</span>
+                        <span class="wf-meta">100 leads / month</span>
+                    </div>
+                    <div style="text-align:center;font-size:0.75rem;color:var(--text-muted);padding:3px 0">Qualification Gate: 12+ months in business, $50K/mo deposits, bank statement via Plaid</div>
+                    <div class="waterfall-step" style="background:#1E5FAA;width:90%">
+                        <span class="wf-label">Gold Tier ($250K-$1M requested) — Direct or Premium Broker</span>
+                        <span class="wf-meta">~18 leads (18%) — $8-12K commission or full direct return</span>
+                    </div>
+                    <div class="waterfall-step" style="background:#5A3A8A;width:75%">
+                        <span class="wf-label">Silver Tier ($50K-$250K) — Broker Placement</span>
+                        <span class="wf-meta">~35 leads (35%) — $3-8K commission avg</span>
+                    </div>
+                    <div class="waterfall-step" style="background:#B85A1A;width:55%">
+                        <span class="wf-label">Bronze Tier (sub-$50K) — Marketplace or Referred</span>
+                        <span class="wf-meta">~22 leads (22%) — marketplace sale or low-cost lender referral</span>
+                    </div>
+                    <div class="waterfall-step" style="background:#7A7570;width:35%">
+                        <span class="wf-label">Declined / Unqualified — Data Marketplace Resale</span>
+                        <span class="wf-meta">~25 leads (25%) — sold aged at $0.50-$3 each</span>
+                    </div>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.75rem;">Every lead generates revenue at some tier. Net cost of lead acquisition approaches zero at scale.</p>
+            </div>
+
+            <div class="card">
+                <h4>Revenue Model — Month 6 Targets</h4>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">$18,750</div>
+                        <div class="metric-label">Lead Sales (Bronze + Aged Data)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$112,500</div>
+                        <div class="metric-label">Broker Commissions (Silver/Gold)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$250,000</div>
+                        <div class="metric-label">Direct Lending Returns</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$45,000</div>
+                        <div class="metric-label">Investor Capital Management Fees</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$24,375</div>
+                        <div class="metric-label">Data Marketplace Subscriptions</div>
+                    </div>
+                    <div class="metric-item" style="background:rgba(201,168,76,0.15);border:1px solid var(--gold)">
+                        <div class="metric-value" style="-webkit-text-fill-color:unset">$450,625</div>
+                        <div class="metric-label">Total Gross Revenue (Month 6)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Qualification Gate — The Structural Advantage</h4>
+                <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.9rem;">Skyline's gate is what separates it from every lead gen competitor. The criteria are tight enough to ensure fundability, loose enough to capture the 20% of SMBs banks routinely decline.</p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">12+ Months</div>
+                        <div class="metric-label">Time in Business (minimum)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$50K/mo</div>
+                        <div class="metric-label">Monthly Deposits (minimum)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">No Tax Returns</div>
+                        <div class="metric-label">Bank Statements Only (via Plaid)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">No Collateral</div>
+                        <div class="metric-label">Unsecured (UCC filing on funded deals)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== KEYWORD INTELLIGENCE ==================== -->
+        <section id="keywords">
+            <h2>🔑 SEMrush Keyword Intelligence</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Keyword targets organized by intent tier — from high-intent funding (hot) to research-stage (warm) to education/content (cold)</p>
+
+            <div class="card">
+                <h4>High-Intent (Ready to Fund)</h4>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Keyword</th><th>Monthly Volume</th><th>KD</th><th>CPC Est.</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>merchant cash advance</td><td>40,500</td><td>52</td><td>$18.40</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>same day business loans</td><td>9,900</td><td>38</td><td>$22.10</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>no doc business loans</td><td>12,100</td><td>41</td><td>$19.80</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>fast business loans</td><td>18,100</td><td>45</td><td>$21.00</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>mca loans</td><td>8,100</td><td>35</td><td>$16.20</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>revenue based financing</td><td>14,800</td><td>43</td><td>$17.60</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>bridge loan business</td><td>6,600</td><td>39</td><td>$24.50</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                            <tr><td>business loans no credit check</td><td>22,200</td><td>44</td><td>$18.90</td><td><span class="badge" style="background:#B83232;color:white">Hot</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Mid-Intent (Comparing Options)</h4>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Keyword</th><th>Monthly Volume</th><th>KD</th><th>CPC Est.</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>small business loans</td><td>450,000</td><td>70</td><td>$25.00</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>business line of credit</td><td>110,000</td><td>60</td><td>$20.30</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>working capital loans</td><td>27,100</td><td>55</td><td>$19.40</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>business loans bad credit</td><td>27,100</td><td>51</td><td>$17.80</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>kabbage alternative</td><td>3,200</td><td>28</td><td>$14.60</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>lendingtree business loans review</td><td>2,400</td><td>32</td><td>$12.80</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>lendio alternative</td><td>1,800</td><td>29</td><td>$13.40</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                            <tr><td>mca funding companies</td><td>5,400</td><td>36</td><td>$21.00</td><td><span class="badge" style="background:#B85A1A;color:white">Warm</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Industry-Specific (Vertical Targeting)</h4>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Keyword</th><th>Monthly Volume</th><th>KD</th><th>Vertical</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>construction business loans</td><td>8,100</td><td>41</td><td>Construction</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                            <tr><td>trucking business loans</td><td>4,400</td><td>35</td><td>Transport</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                            <tr><td>restaurant business loans</td><td>6,600</td><td>43</td><td>Food &amp; Bev</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                            <tr><td>medical practice financing</td><td>5,400</td><td>46</td><td>Healthcare</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                            <tr><td>retail store business loan</td><td>3,600</td><td>38</td><td>Retail</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                            <tr><td>auto dealer financing options</td><td>2,900</td><td>40</td><td>Auto</td><td><span class="badge" style="background:#1E5FAA;color:white">Vertical</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Investor Side (Capital Raising)</h4>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Keyword</th><th>Monthly Volume</th><th>KD</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>invest in business loans</td><td>2,400</td><td>30</td><td><span class="badge" style="background:#6B3FA0;color:white">Investor</span></td></tr>
+                            <tr><td>alternative investment fund</td><td>9,900</td><td>55</td><td><span class="badge" style="background:#6B3FA0;color:white">Investor</span></td></tr>
+                            <tr><td>accredited investor opportunities</td><td>5,400</td><td>42</td><td><span class="badge" style="background:#6B3FA0;color:white">Investor</span></td></tr>
+                            <tr><td>private credit investing</td><td>4,400</td><td>48</td><td><span class="badge" style="background:#6B3FA0;color:white">Investor</span></td></tr>
+                            <tr><td>MCA investment returns</td><td>1,200</td><td>22</td><td><span class="badge" style="background:#6B3FA0;color:white">Investor</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== STRATEGIC OPPORTUNITIES ==================== -->
+        <section id="opportunities">
+            <h2>🎯 Strategic Opportunities — Priority Order</h2>
+
+            <div class="card">
+                <h3>Immediate (0-30 Days)</h3>
+                <ul class="feature-list">
+                    <li><strong>Claim "kabbage alternative" and "kabbage loan" keywords:</strong> Displaced borrowers actively searching — KD 28, high intent.</li>
+                    <li><strong>Launch Plaid-integrated application flow:</strong> Bank statement only, no tax returns — the key differentiator vs. banks.</li>
+                    <li><strong>Recruit 3-5 displaced ISO brokers from Kabbage's dissolved network:</strong> They need a new home. Skyline's commission structure is the pitch.</li>
+                    <li><strong>Build first data marketplace listing:</strong> Package the declined applications from the first 60 days. First B2B sale proves the model.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Short-Term (30-90 Days)</h3>
+                <ul class="feature-list">
+                    <li><strong>Industry-specific landing pages:</strong> Construction, trucking, restaurants, healthcare — each vertical converts at 2-3x generic pages.</li>
+                    <li><strong>"vs" content pages:</strong> "Skyline vs LendingTree," "Skyline vs Lendio" — capture comparison traffic with KD 28-35.</li>
+                    <li><strong>Reg D investor portal launch:</strong> First 5 accredited investors at $50K each = $250K capital deployed for direct lending.</li>
+                    <li><strong>Speed guarantee messaging:</strong> "Decision in 24 hours" is credible at bank-statement-only underwriting. Make it the headline.</li>
+                    <li><strong>MCA keyword blitz:</strong> "merchant cash advance" + "mca loans" — LendingTree underserves these; Skyline can rank faster in this niche.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>12-Month Revenue Targets</h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">$1.63M</div>
+                        <div class="metric-label">Monthly Revenue at Scale</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$500K</div>
+                        <div class="metric-label">Direct Loan Book (Month 3)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">20</div>
+                        <div class="metric-label">Active Sales Reps</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">$2.5M</div>
+                        <div class="metric-label">Investor Capital Deployed</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">10</div>
+                        <div class="metric-label">B2B Data Marketplace Buyers</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">75+</div>
+                        <div class="metric-label">ISO Partners in Network</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>The Compounding Moat — Why This Gets Harder to Copy Over Time</h3>
+                <ul class="feature-list">
+                    <li><strong>Data asset:</strong> Every application — funded, declined, or sold — trains the underwriting model. After 12 months, Skyline's risk scoring is a proprietary asset.</li>
+                    <li><strong>Lender relationships:</strong> Placement volume builds preferred partner status with top funders. Better rates, faster approvals, higher caps.</li>
+                    <li><strong>Investor trust:</strong> 20-25% returns compound investor loyalty. Capital pool grows without additional CAC.</li>
+                    <li><strong>ISO network:</strong> Brokers who generate volume stay if the platform and commissions are right. Network effects favor the incumbent.</li>
+                    <li><strong>SEO authority:</strong> Content built for "no doc business loans" and "merchant cash advance" in Month 1 compounds for 36 months. LendingTree's moat was built the same way — they just started earlier.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ==================== DATA SOURCES ==================== -->
+        <div class="data-source">
+            <p><strong>Data Sources:</strong> SEMrush, SimilarWeb, LendingTree 10-K (2024), American Express 10-K (2024), Lendio press releases, Nav investor data, Trustpilot, Google Reviews, Reddit (r/smallbusiness, r/Entrepreneur, r/Finance), Federal Reserve Small Business Credit Survey (2024), SBFA Alternative Lending Report, deBanked MCA Industry Report 2024.</p>
+            <p style="margin-top: 0.5rem;"><em>Prepared by FuturProof Labs — May 2026</em></p>
+        </div>
+    </div>
+
+<script>
+(function(){
+  const gate=document.getElementById('pw-gate');
+  if(sessionStorage.getItem('skyline_auth')==='1'){gate.classList.add('hidden');return;}
+  gate.querySelector('#pw-input').focus();
+})();
+function checkPw(){
+  const val=document.getElementById('pw-input').value;
+  const err=document.getElementById('pw-err');
+  if(val==='lending'){
+    sessionStorage.setItem('skyline_auth','1');
+    document.getElementById('pw-gate').classList.add('hidden');
+    err.textContent='';
+  } else {
+    err.textContent='Incorrect password.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+</script>
+</body>
+</html>
