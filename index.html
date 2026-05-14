@@ -142,8 +142,8 @@ td strong{color:var(--text);font-weight:600}
 /* PASSWORD GATE */
 #pw-gate{position:fixed;inset:0;background:var(--charcoal);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
 #pw-gate.hidden{display:none}
-.pw-box{background:#242424;border:1px solid #3A3A3A;border-radius:10px;padding:2.5rem 2.75rem;text-align:center;width:340px;max-width:90vw}
-.pw-logo{height:28px;margin:0 auto 1.5rem;display:block}
+.pw-box{background:#242424;border:1px solid #3A3A3A;border-radius:10px;padding:2.5rem 2.75rem;text-align:center;width:460px;max-width:92vw}
+.pw-logo{height:36px;margin:0 auto 0.6rem;display:block}
 .pw-title{font-size:1rem;font-weight:700;color:white;margin-bottom:0.25rem}
 .pw-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:1.5rem}
 .pw-input{width:100%;background:#1A1A1A;border:1px solid #444;border-radius:6px;color:white;font-family:'Inter',sans-serif;font-size:0.9rem;padding:0.7rem 1rem;outline:none;letter-spacing:0.06em;text-align:center}
@@ -168,9 +168,11 @@ td strong{color:var(--text);font-weight:600}
 <!-- PASSWORD GATE -->
 <div id="pw-gate">
   <div class="pw-box">
-    <img src="https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png" class="pw-logo" alt="FuturProof Labs" onerror="this.style.display='none'">
+    <img src="https://futur-proof.com/images/futurproof-logo.png" class="pw-logo" alt="FuturProof Labs"
+      onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/Futur-Proof/futur-proof-website/main/public/images/futurproof-logo.png';this.onerror=function(){this.style.display='none'};">
+    <div style="font-size:0.82rem;color:rgba(255,255,255,0.38);letter-spacing:0.04em;margin-bottom:1.5rem;margin-top:0.35rem;line-height:1.55;">Operations Dashboard<br>by FuturProof Labs</div>
     <div class="pw-title">Skyline Capital</div>
-    <div class="pw-sub">Operations Dashboard — Restricted Access</div>
+    <div class="pw-sub">Restricted Access</div>
     <input id="pw-input" class="pw-input" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkPw()">
     <button class="pw-btn" onclick="checkPw()">Access Dashboard</button>
     <div class="pw-err" id="pw-err"></div>
