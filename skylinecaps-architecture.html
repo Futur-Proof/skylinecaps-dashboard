@@ -488,6 +488,7 @@
     <li><a href="#database">Database</a></li>
     <li><a href="#routes">Routes</a></li>
     <li><a href="#integrations">Integrations</a></li>
+    <li><a href="#lender-network">Lender Network</a></li>
     <li><a href="#investor">Investor Portal</a></li>
     <li><a href="#marketplace">Data Marketplace</a></li>
     <li><a href="#compliance">Compliance</a></li>
@@ -1062,6 +1063,77 @@
         <li>Replaces manual document review</li>
       </ul>
     </div>
+    <div class="integration">
+      <h4 style="color:var(--blue);margin-bottom:0.75rem;">Boberdoo / LeadsPedia</h4>
+      <ul>
+        <li>Ping-post lead routing — push a lead, lenders bid or accept/reject in real time with a price returned instantly</li>
+        <li>Immediate access to lender networks with zero individual outreach — lenders already on the network</li>
+        <li>Boberdoo: most widely used for MCA and SMB lenders; LeadsPedia: lending-native, strong credit union and specialty lender coverage</li>
+        <li>Set up criteria once; routing runs automatically on every submission</li>
+        <li>Day-one lender access before any ISO agreements are signed</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--green);margin-bottom:0.75rem;">Lendflow</h4>
+      <ul>
+        <li>Real-time multi-lender decisioning API — push borrower data, receive multiple offers with rates and terms in one call</li>
+        <li>Powers the "here are your best offers before you apply" UI on <code>/apply/offers</code></li>
+        <li>Each lender's pre-loaded criteria matched automatically; no manual submission per lender</li>
+        <li>Returns APR-equivalent, factor rate, and term side-by-side for borrower comparison</li>
+        <li>Phase 2 integration — replaces manual offer-building step in the rep workflow</li>
+      </ul>
+    </div>
+    <div class="integration">
+      <h4 style="color:var(--gold);margin-bottom:0.75rem;">Direct ISO Partner APIs</h4>
+      <ul>
+        <li>OnDeck, Bluevine, Fundbox, Lendistry, LendingFront — all maintain ISO/broker partner programs with submission APIs</li>
+        <li>Sign broker agreement → receive API credentials → push lead package, receive decision and offer programmatically</li>
+        <li>Higher commissions than ping-post; direct relationship and dedicated underwriting contacts</li>
+        <li>Same lenders named by Plaid as primary SMB lending customers</li>
+        <li>Target: 3 to 5 signed ISO agreements by end of Month 2</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LENDER NETWORK -->
+<section id="lender-network">
+  <div class="section-label">Lender Infrastructure</div>
+  <h2>Lender Routing Sequence</h2>
+  <p class="section-sub">The lender market is fragmented by design. No single API connects all of them. This is the realistic build sequence — ordered by speed to first placement.</p>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:2rem;">
+    <div style="display:grid;grid-template-columns:120px 1fr;gap:0;">
+      <div style="padding:0.75rem 1rem;background:var(--dark);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);">Timeline</div>
+      <div style="padding:0.75rem 1rem;background:var(--dark);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);">Action</div>
+
+      <div style="padding:1rem;font-size:0.75rem;font-weight:700;color:var(--green);border-bottom:1px solid var(--border);background:rgba(34,197,94,0.04);">Now</div>
+      <div style="padding:1rem;font-size:0.83rem;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(34,197,94,0.04);"><span style="color:var(--text);font-weight:600;">Sign up for Boberdoo or LeadsPedia.</span> Lenders already on the network are immediately reachable. Zero individual outreach required. Set your criteria once — leads route and price automatically.</div>
+
+      <div style="padding:1rem;font-size:0.75rem;font-weight:700;color:var(--gold);border-bottom:1px solid var(--border);">Month 1–2</div>
+      <div style="padding:1rem;font-size:0.83rem;color:var(--muted);border-bottom:1px solid var(--border);"><span style="color:var(--text);font-weight:600;">Direct ISO agreements with OnDeck, Bluevine, Lendistry, LendingFront, Fundbox.</span> All have published partner programs. Sign the broker agreement, get API credentials, push deals programmatically. Higher commissions and dedicated contacts versus ping-post.</div>
+
+      <div style="padding:1rem;font-size:0.75rem;font-weight:700;color:var(--blue);border-bottom:1px solid var(--border);">Month 2–3</div>
+      <div style="padding:1rem;font-size:0.83rem;color:var(--muted);border-bottom:1px solid var(--border);"><span style="color:var(--text);font-weight:600;">Integrate Lendflow for real-time multi-lender decisioning.</span> Push borrower profile, receive multiple lender offers with rates and terms in one call. Powers the "here are your best options" UI before the borrower formally applies — highest-converting feature in the flow.</div>
+
+      <div style="padding:1rem;font-size:0.75rem;font-weight:700;color:var(--silver);">Month 3+</div>
+      <div style="padding:1rem;font-size:0.83rem;color:var(--muted);"><span style="color:var(--text);font-weight:600;">Banks and credit unions via state leagues and CUSOs.</span> Traditional CUs run on legacy LOS systems (Jack Henry, Fiserv, FIS) with no public lead intake APIs. Reach business lending officers directly, contact state credit union leagues for referral programs, and evaluate Blend or nCino integrations as a longer-term play to reach multiple institutions at once.</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-blue">
+      <h4 style="margin-bottom:0.75rem;">Middesk — KYB Only</h4>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.7;">
+        Middesk's role is KYB verification: EIN, OFAC, beneficial ownership. It is <span style="color:var(--text);font-weight:600;">not a lender matching tool</span>. For lender matching and offer surfacing, use Lendflow. These are distinct tools with distinct roles — Middesk gates compliance; Lendflow gates lender routing.
+      </div>
+    </div>
+    <div class="card card-gold">
+      <h4 style="margin-bottom:0.75rem;">Nav — Matched Offers Marketplace</h4>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.7;">
+        Nav is a business credit and lending marketplace with an API. Push a borrower profile, receive back matched offers from lenders who have pre-loaded criteria. Secondary option to Lendflow for offer surfacing — evaluate both in Month 2–3 and run the one with better lender coverage for the target verticals.
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1293,7 +1365,15 @@
     </div>
     <div class="tech-item">
       <div class="tech-name">Middesk</div>
-      <div class="tech-role">KYB, OFAC, Business Verification</div>
+      <div class="tech-role">KYB, OFAC, Business Verification — compliance gate only</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Boberdoo / LeadsPedia</div>
+      <div class="tech-role">Ping-Post Lead Routing, Instant Lender Network Access</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Lendflow</div>
+      <div class="tech-role">Real-Time Multi-Lender Decisioning, Borrower Offer Surfacing</div>
     </div>
     <div class="tech-item">
       <div class="tech-name">pg_cron</div>
@@ -1326,7 +1406,8 @@
         <li>Lead qualification engine</li>
         <li>Tier assignment</li>
         <li>Basic CRM for reps</li>
-        <li>Broker partner routing</li>
+        <li>Boberdoo or LeadsPedia account — instant ping-post routing to lender network</li>
+        <li>Broker partner routing with webhook delivery</li>
         <li>Email notifications</li>
       </ul>
       <div style="margin-top:1rem;" class="tag tag-green">Revenue: Lead resale + broker commissions</div>
@@ -1364,7 +1445,9 @@
       <h3>Automation</h3>
       <ul>
         <li>Auto capital allocation engine</li>
-        <li>Lender API integrations</li>
+        <li>Direct ISO agreements: OnDeck, Bluevine, Fundbox, Lendistry, LendingFront</li>
+        <li>Lendflow real-time multi-lender decisioning in borrower flow</li>
+        <li>Bank and credit union outreach via state leagues and CUSOs</li>
         <li>Programmatic routing rules UI</li>
         <li>Advanced CRM analytics</li>
         <li>Parallel Markets accreditation</li>

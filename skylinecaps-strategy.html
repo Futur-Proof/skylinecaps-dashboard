@@ -552,6 +552,7 @@
     <li><a href="#targeting">Industries</a></li>
     <li><a href="#revenue">Revenue</a></li>
     <li><a href="#gtm">Build Plan</a></li>
+    <li><a href="#lender-routing">Lender Routing</a></li>
     <li><a href="#competitors">Competitors</a></li>
     <li><a href="#phases">Phases</a></li>
   </ul>
@@ -1275,10 +1276,10 @@
       <div class="gtm-row">
         <div>
           <div class="gtm-phase">Month 1 to 2</div>
-          <div class="gtm-phase-sub">Declined Data Buyback</div>
+          <div class="gtm-phase-sub">Lender Network + Declined Data</div>
         </div>
         <div class="gtm-detail">
-          <strong>Reach out to 3 to 5 direct lenders for their declined pipeline.</strong> OnDeck, Kabbage (AmEx), Bluevine all have leads they cannot place. Buy their monthly batch at low cost. You know the product and can work it from day one. Instant volume with high data quality.
+          <strong>Two tracks in parallel.</strong> (1) Sign up for Boberdoo or LeadsPedia — instant access to lenders already on the network, zero individual outreach, leads route and price automatically. (2) Reach out to 3 to 5 direct lenders for their declined pipeline. OnDeck, Kabbage (AmEx), Bluevine all have leads they cannot place. Buy their monthly batch at low cost. You know the product and can work it from day one. Instant volume with high data quality. Also begin ISO broker agreements with OnDeck, Bluevine, Fundbox, Lendistry, and LendingFront.
         </div>
       </div>
       <div class="gtm-row">
@@ -1317,6 +1318,47 @@
           <strong>Build topical authority in the SMB lending space.</strong> One deep page per industry vertical, one page per keyword cluster. Six to twelve months to rank but compounding free traffic that grows forever. This is how you reduce paid acquisition cost to near zero over time.
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- LENDER ROUTING -->
+<section id="lender-routing">
+  <div class="sec-label">Lender Infrastructure</div>
+  <h2>How Leads Reach Lenders</h2>
+  <p class="sec-sub">There is no single API that connects to all lenders. The market is fragmented by design. This is the correct build sequence — ordered by speed to first placed deal.</p>
+
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:2rem;">
+    <div style="display:grid;grid-template-columns:130px 1fr;gap:0;">
+      <div style="padding:0.75rem 1rem;background:var(--bg);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);">When</div>
+      <div style="padding:0.75rem 1rem;background:var(--bg);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);">What to Do</div>
+
+      <div style="padding:1.1rem 1rem;font-size:0.78rem;font-weight:700;color:var(--green);border-bottom:1px solid var(--border);background:var(--green-bg);">Now</div>
+      <div style="padding:1.1rem 1.25rem;font-size:0.82rem;color:var(--muted);border-bottom:1px solid var(--border);background:var(--green-bg);"><strong style="color:var(--text2);">Sign up for Boberdoo or LeadsPedia.</strong> These are ping-post platforms — push a lead, lenders bid or accept/reject in real time, price returns instantly. Lenders already on the network are immediately reachable. Zero individual outreach. Set criteria once, routing runs automatically on every submission. This is the fastest path from lead to placed deal.</div>
+
+      <div style="padding:1.1rem 1rem;font-size:0.78rem;font-weight:700;color:var(--gold);border-bottom:1px solid var(--border);">Month 1–2</div>
+      <div style="padding:1.1rem 1.25rem;font-size:0.82rem;color:var(--muted);border-bottom:1px solid var(--border);"><strong style="color:var(--text2);">Direct ISO agreements with OnDeck, Bluevine, Lendistry, LendingFront, Fundbox.</strong> All maintain published ISO/broker partner programs with submission APIs. Sign the broker agreement, receive API credentials, push the lead package programmatically, and receive a decision and offer back. Higher commissions than ping-post and dedicated underwriting contacts. These are the same lenders Plaid names as their primary SMB lending customers.</div>
+
+      <div style="padding:1.1rem 1rem;font-size:0.78rem;font-weight:700;color:var(--blue);border-bottom:1px solid var(--border);">Month 2–3</div>
+      <div style="padding:1.1rem 1.25rem;font-size:0.82rem;color:var(--muted);border-bottom:1px solid var(--border);"><strong style="color:var(--text2);">Integrate Lendflow for real-time multi-lender decisioning.</strong> Push a borrower profile and receive multiple lender offers — with rates, terms, and APR — in one API call. This powers the "here are your best options" screen before the borrower formally applies. Highest-converting feature in the flow: the borrower sees competing offers, picks one, and applies directly into the winning lender. Evaluate Nav as a secondary option for matched offers.</div>
+
+      <div style="padding:1.1rem 1rem;font-size:0.78rem;font-weight:700;color:var(--silver);">Month 3+</div>
+      <div style="padding:1.1rem 1.25rem;font-size:0.82rem;color:var(--muted);"><strong style="color:var(--text2);">Banks and credit unions via state leagues and CUSOs.</strong> Traditional CUs run on legacy LOS systems (Jack Henry, Fiserv, FIS) with no public lead intake APIs. The path in: contact state credit union leagues (California Credit Union League, etc.) for referral programs, reach CUSO networks that aggregate CU partners, and evaluate Blend or nCino integrations as a longer-horizon play to reach multiple institutions at once without individual outreach.</div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card card-gold">
+      <h3>Boberdoo vs. LeadsPedia</h3>
+      <p>Both are ping-post. Boberdoo is the SMB/MCA-native choice — most MCA lenders are already on it. LeadsPedia has stronger credit union and specialty lender coverage. Start with Boberdoo, add LeadsPedia if lender variety is thin in target verticals.</p>
+    </div>
+    <div class="card card-blue">
+      <h3>Lendflow vs. Nav</h3>
+      <p>Lendflow returns real-time decisioned offers from multiple lenders in one API call — built for the "show offers first" flow. Nav is a matching marketplace — push a profile, get matched lenders. Lendflow is the right tool for the pre-application offer surfacing screen. Evaluate both in Month 2–3.</p>
+    </div>
+    <div class="card card-silver">
+      <h3>Middesk Clarification</h3>
+      <p>Middesk is KYB and OFAC verification — EIN confirmation, sanctions screening, beneficial ownership. It is not a lender matching tool. Lender matching is Lendflow. Middesk gates compliance before a loan funds; Lendflow gates lender routing before a borrower applies.</p>
     </div>
   </div>
 </section>
@@ -1497,7 +1539,9 @@
         <h4>Scale and Automation</h4>
         <ul>
           <li>Automated capital allocation engine — pro-rata by available balance</li>
-          <li>Lender API integrations for programmatic deal submission</li>
+          <li>Direct ISO agreements with OnDeck, Bluevine, Fundbox, Lendistry, LendingFront — programmatic submission APIs</li>
+          <li>Lendflow real-time multi-lender decisioning layer — borrower offer surfacing before application</li>
+          <li>Bank and credit union referral partnerships via state leagues and CUSOs</li>
           <li>Routing rules UI — business rule changes without code deploys</li>
           <li>Advanced CRM analytics: cohort performance, rep leaderboard</li>
           <li>Third-party investor accreditation verification</li>
